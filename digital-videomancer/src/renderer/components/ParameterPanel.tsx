@@ -26,9 +26,27 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
 
     if (!effect) {
         return (
-            <div style={{ width: '250px', background: '#222', color: '#eee', padding: '10px', borderLeft: '1px solid #444' }}>
-                <div style={{ color: '#666', textAlign: 'center', paddingTop: '20px' }}>
-                    Select an effect to edit its parameters
+            <div className="console-panel" style={{ height: '100%' }}>
+                <div className="console-panel-header">
+                    <span>Parameters</span>
+                    <div className="led-indicator" />
+                </div>
+                <div className="console-panel-content" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                }}>
+                    <div style={{
+                        color: 'var(--vm-text-dim)',
+                        fontSize: '11px',
+                        fontFamily: 'var(--font-label)',
+                        letterSpacing: '0.05em',
+                    }}>
+                        SELECT AN EFFECT
+                        <br />
+                        <span style={{ fontSize: '10px', opacity: 0.6 }}>to edit parameters</span>
+                    </div>
                 </div>
             </div>
         );
@@ -52,115 +70,159 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
     };
 
     return (
-        <div style={{ width: '250px', background: '#222', color: '#eee', padding: '10px', borderLeft: '1px solid #444' }}>
-            <h3 style={{ margin: '0 0 15px 0', fontSize: '1em', borderBottom: '1px solid #444', paddingBottom: '10px' }}>
-                {effect.name}
-            </h3>
-            {effect.parameters.length === 0 && (
-                <div style={{ color: '#666', fontSize: '0.9em' }}>No parameters available</div>
-            )}
-            {effect.parameters.map(param => {
-                const isModulated = lfoManager?.isParameterModulated(effect.id, param.id);
-                const mapping = lfoManager?.getMappingForParameter(effect.id, param.id);
-                const modulatingLfo = mapping ? lfoManager?.getLFO(mapping.lfoId) : null;
+        <div className="console-panel" style={{ height: '100%' }}>
+            <div className="console-panel-header">
+                <span>{effect.name}</span>
+                <div className="led-indicator active" />
+            </div>
 
-                return (
-                    <div key={param.id} style={{ marginBottom: '15px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <label style={{ fontSize: '0.9em', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                {param.label}
-                                {isModulated && (
-                                    <span
-                                        title={`Modulated by ${modulatingLfo?.name || 'LFO'}`}
-                                        style={{
-                                            background: '#664',
-                                            padding: '1px 5px',
-                                            borderRadius: '3px',
-                                            fontSize: '0.7em',
-                                            color: '#ffa',
-                                        }}
-                                    >
-                                        ⟳ {modulatingLfo?.name}
-                                    </span>
-                                )}
-                            </label>
-                            <button
-                                onClick={() => handleLearn(param.id, param.min || 0, param.max || 1)}
-                                style={{
-                                    fontSize: '0.7em',
-                                    background: learningParam === param.id ? '#c44' : '#444',
-                                    border: 'none',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    padding: '3px 6px',
-                                    borderRadius: '2px',
-                                }}
-                            >
-                                {learningParam === param.id ? '🎹 Listening...' : '🎹 Learn'}
-                            </button>
-                        </div>
-                        {param.type === 'float' && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input
-                                    type="range"
-                                    min={param.min}
-                                    max={param.max}
-                                    step={param.step || 0.01}
-                                    value={effect.uniforms[param.id]?.value || 0}
-                                    onChange={(e) => handleChange(param.id, parseFloat(e.target.value))}
-                                    disabled={isModulated}
-                                    style={{
-                                        flex: 1,
-                                        opacity: isModulated ? 0.5 : 1,
-                                    }}
-                                />
-                                <span style={{
-                                    fontSize: '0.8em',
-                                    width: '40px',
-                                    textAlign: 'right',
-                                    fontFamily: 'monospace',
-                                }}>
-                                    {typeof effect.uniforms[param.id]?.value === 'number'
-                                        ? effect.uniforms[param.id].value.toFixed(2)
-                                        : '0.00'}
-                                </span>
-                            </div>
-                        )}
-                        {param.type === 'boolean' && (
-                            <button
-                                onClick={() => handleChange(param.id, !effect.uniforms[param.id]?.value)}
-                                style={{
-                                    background: effect.uniforms[param.id]?.value ? '#4a4' : '#444',
-                                    border: 'none',
-                                    color: 'white',
-                                    padding: '6px 12px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                }}
-                            >
-                                {effect.uniforms[param.id]?.value ? 'ON' : 'OFF'}
-                            </button>
-                        )}
-                        {isModulated && (
-                            <button
-                                onClick={() => lfoManager?.unmapParameter(effect.id, param.id)}
-                                style={{
-                                    marginTop: '4px',
-                                    fontSize: '0.7em',
-                                    background: '#633',
-                                    border: 'none',
-                                    color: '#faa',
-                                    padding: '2px 6px',
-                                    cursor: 'pointer',
-                                    borderRadius: '2px',
-                                }}
-                            >
-                                Remove LFO
-                            </button>
-                        )}
+            <div className="console-panel-content">
+                {effect.parameters.length === 0 && (
+                    <div style={{
+                        color: 'var(--vm-text-dim)',
+                        fontSize: '11px',
+                        fontFamily: 'var(--font-label)',
+                        textAlign: 'center',
+                        padding: '16px',
+                    }}>
+                        NO PARAMETERS
                     </div>
-                );
-            })}
+                )}
+
+                {effect.parameters.map(param => {
+                    const isModulated = lfoManager?.isParameterModulated(effect.id, param.id);
+                    const mapping = lfoManager?.getMappingForParameter(effect.id, param.id);
+                    const modulatingLfo = mapping ? lfoManager?.getLFO(mapping.lfoId) : null;
+                    const currentValue = effect.uniforms[param.id]?.value;
+
+                    return (
+                        <div key={param.id} style={{
+                            marginBottom: '12px',
+                            padding: '10px',
+                            background: 'var(--vm-enclosure-dark)',
+                            borderRadius: '4px',
+                            border: '1px solid var(--vm-panel-border)',
+                        }}>
+                            {/* Parameter Header */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: '8px',
+                            }}>
+                                <label style={{
+                                    fontFamily: 'var(--font-label)',
+                                    fontSize: '10px',
+                                    color: 'var(--vm-silkscreen)',
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                }}>
+                                    {param.label}
+                                    {isModulated && (
+                                        <span style={{
+                                            background: 'var(--vm-accent-warning)',
+                                            padding: '2px 6px',
+                                            borderRadius: '2px',
+                                            fontSize: '9px',
+                                            color: '#000',
+                                            fontWeight: '600',
+                                        }}>
+                                            LFO: {modulatingLfo?.name}
+                                        </span>
+                                    )}
+                                </label>
+                                <button
+                                    onClick={() => handleLearn(param.id, param.min || 0, param.max || 1)}
+                                    className="vm-button"
+                                    style={{
+                                        fontSize: '9px',
+                                        padding: '3px 8px',
+                                        background: learningParam === param.id
+                                            ? 'var(--vm-accent-danger)'
+                                            : 'var(--vm-enclosure-mid)',
+                                    }}
+                                >
+                                    {learningParam === param.id ? 'LISTENING...' : 'MIDI'}
+                                </button>
+                            </div>
+
+                            {/* Float Parameter - Fader style slider */}
+                            {param.type === 'float' && (
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                }}>
+                                    {/* Fader Track */}
+                                    <div style={{ flex: 1, position: 'relative' }}>
+                                        <input
+                                            type="range"
+                                            min={param.min}
+                                            max={param.max}
+                                            step={param.step || 0.01}
+                                            value={typeof currentValue === 'number' ? currentValue : 0}
+                                            onChange={(e) => handleChange(param.id, parseFloat(e.target.value))}
+                                            disabled={isModulated}
+                                            className="vm-fader"
+                                            style={{
+                                                opacity: isModulated ? 0.5 : 1,
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* LCD Value Display */}
+                                    <div className="vm-lcd vm-lcd-small" style={{
+                                        minWidth: '52px',
+                                        textAlign: 'right',
+                                        fontSize: '13px',
+                                        padding: '3px 6px',
+                                    }}>
+                                        {typeof currentValue === 'number'
+                                            ? currentValue.toFixed(2)
+                                            : '0.00'}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Boolean Parameter - Toggle button */}
+                            {param.type === 'boolean' && (
+                                <button
+                                    onClick={() => handleChange(param.id, !currentValue)}
+                                    className={`vm-button vm-button-led ${currentValue ? 'active' : ''}`}
+                                    style={{
+                                        width: '100%',
+                                        background: currentValue
+                                            ? 'linear-gradient(180deg, var(--vm-accent-success) 0%, #228833 100%)'
+                                            : 'linear-gradient(180deg, var(--vm-enclosure-mid) 0%, var(--vm-enclosure-dark) 100%)',
+                                    }}
+                                >
+                                    {currentValue ? 'ON' : 'OFF'}
+                                </button>
+                            )}
+
+                            {/* Remove LFO mapping button */}
+                            {isModulated && (
+                                <button
+                                    onClick={() => lfoManager?.unmapParameter(effect.id, param.id)}
+                                    className="vm-button"
+                                    style={{
+                                        marginTop: '8px',
+                                        fontSize: '9px',
+                                        padding: '4px 8px',
+                                        background: 'var(--vm-accent-danger)',
+                                        width: '100%',
+                                    }}
+                                >
+                                    REMOVE LFO
+                                </button>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 };

@@ -13,7 +13,6 @@ import { MidiManager } from './renderer/services/MidiManager'
 import { LFOManager } from './renderer/engine/modulation/LFOManager'
 import { MidiSettings } from './renderer/components/MidiSettings'
 import { RecorderManager } from './renderer/services/RecorderManager'
-import { OutputControls } from './renderer/components/OutputControls'
 
 function App() {
   const sourceManager = useMemo(() => new SourceManager(), []);

@@ -48,49 +48,107 @@ export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManag
     };
 
     return (
-        <div className="mixer-controls" style={{ padding: '10px', background: '#222', color: '#eee', borderTop: '1px solid #444' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <div className="source-a">
-                    <label>Source A: </label>
-                    <select onChange={(e) => handleSourceChange('A', e.target.value as VideoSourceType)}>
-                        <option value="none">None</option>
-                        <option value="webcam">Webcam</option>
-                        <option value="file">File</option>
-                    </select>
+        <div style={{
+            display: 'flex',
+            gap: '24px',
+            alignItems: 'center',
+        }}>
+            {/* Source A */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '10px',
+                    color: 'var(--vm-silkscreen)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                }}>
+                    Source A
+                </label>
+                <select
+                    onChange={(e) => handleSourceChange('A', e.target.value as VideoSourceType)}
+                    className="vm-select"
+                    style={{ minWidth: '120px' }}
+                >
+                    <option value="none">NONE</option>
+                    <option value="webcam">WEBCAM</option>
+                    <option value="file">FILE...</option>
+                </select>
+            </div>
+
+            {/* Mix Fader */}
+            <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                maxWidth: '400px',
+            }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontFamily: 'var(--font-label)',
+                    fontSize: '11px',
+                    color: 'var(--vm-silkscreen-dim)',
+                    letterSpacing: '0.1em',
+                }}>
+                    <span>A</span>
+                    <span style={{ color: 'var(--vm-silkscreen)' }}>CROSSFADE</span>
+                    <span>B</span>
                 </div>
-                <div className="source-b">
-                    <label>Source B: </label>
-                    <select onChange={(e) => handleSourceChange('B', e.target.value as VideoSourceType)}>
-                        <option value="none">None</option>
-                        <option value="webcam">Webcam</option>
-                        <option value="file">File</option>
-                    </select>
+                <div style={{ position: 'relative' }}>
+                    <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        defaultValue="0"
+                        onChange={handleMixChange}
+                        className="vm-fader"
+                        style={{ width: '100%' }}
+                    />
                 </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span>A</span>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    defaultValue="0"
-                    onChange={handleMixChange}
-                    style={{ flex: 1 }}
-                />
-                <span>B</span>
+            {/* Source B */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '10px',
+                    color: 'var(--vm-silkscreen)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                }}>
+                    Source B
+                </label>
+                <select
+                    onChange={(e) => handleSourceChange('B', e.target.value as VideoSourceType)}
+                    className="vm-select"
+                    style={{ minWidth: '120px' }}
+                >
+                    <option value="none">NONE</option>
+                    <option value="webcam">WEBCAM</option>
+                    <option value="file">FILE...</option>
+                </select>
             </div>
 
-            <div style={{ marginTop: '10px' }}>
-                <label>Blend Mode: </label>
-                <select onChange={handleBlendChange}>
-                    <option value="normal">Normal (Crossfade)</option>
-                    <option value="add">Add</option>
-                    <option value="multiply">Multiply</option>
-                    <option value="screen">Screen</option>
-                    <option value="overlay">Overlay</option>
-                    <option value="difference">Difference</option>
+            {/* Blend Mode */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '10px',
+                    color: 'var(--vm-silkscreen)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                }}>
+                    Blend
+                </label>
+                <select onChange={handleBlendChange} className="vm-select">
+                    <option value="normal">NORMAL</option>
+                    <option value="add">ADD</option>
+                    <option value="multiply">MULTIPLY</option>
+                    <option value="screen">SCREEN</option>
+                    <option value="overlay">OVERLAY</option>
+                    <option value="difference">DIFFERENCE</option>
                 </select>
             </div>
         </div>

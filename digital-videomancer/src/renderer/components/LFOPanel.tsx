@@ -10,19 +10,12 @@ interface LFOPanelProps {
 }
 
 const waveformOptions: { value: LFOWaveform; label: string; icon: string }[] = [
-    { value: 'sine', label: 'Sine', icon: '∿' },
-    { value: 'square', label: 'Square', icon: '⊓' },
-    { value: 'saw', label: 'Saw', icon: '⋰' },
-    { value: 'triangle', label: 'Triangle', icon: '△' },
+    { value: 'sine', label: 'Sine', icon: '~' },
+    { value: 'square', label: 'Square', icon: '[]' },
+    { value: 'saw', label: 'Saw', icon: '/' },
+    { value: 'triangle', label: 'Triangle', icon: '/\\' },
     { value: 'random', label: 'Random', icon: '?' },
 ];
-
-// Reserved for future use when mode selection UI is added
-// const modeOptions: { value: ModulationMode; label: string }[] = [
-//     { value: 'replace', label: 'Replace' },
-//     { value: 'add', label: 'Add' },
-//     { value: 'multiply', label: 'Multiply' },
-// ];
 
 export const LFOPanel: React.FC<LFOPanelProps> = ({ lfoManager, effects, onUpdate }) => {
     const [, setTick] = useState(0);
@@ -79,304 +72,459 @@ export const LFOPanel: React.FC<LFOPanelProps> = ({ lfoManager, effects, onUpdat
     };
 
     return (
-        <div style={{
-            background: '#1a1a2e',
-            color: '#eee',
-            padding: '10px',
-            borderTop: '1px solid #444',
-            maxHeight: '300px',
-            overflowY: 'auto',
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ margin: 0, fontSize: '1em' }}>⏱️ LFOs</h3>
-                <button
-                    onClick={handleCreateLFO}
-                    style={{
-                        background: '#4a4',
-                        border: 'none',
-                        color: 'white',
-                        padding: '4px 8px',
-                        cursor: 'pointer',
-                        borderRadius: '4px',
-                        fontSize: '0.8em',
-                    }}
-                >
-                    + Add LFO
-                </button>
-            </div>
-
-            {/* LFO List */}
-            <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                {lfoManager.lfos.map(lfo => (
-                    <div
-                        key={lfo.id}
-                        onClick={() => setSelectedLfoId(lfo.id)}
-                        style={{
-                            padding: '6px 10px',
-                            background: selectedLfoId === lfo.id ? '#444' : '#333',
-                            border: selectedLfoId === lfo.id ? '1px solid #666' : '1px solid transparent',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
-                            opacity: lfo.enabled ? 1 : 0.5,
-                        }}
-                    >
-                        <span style={{ marginRight: '5px' }}>
-                            {waveformOptions.find(w => w.value === lfo.waveform)?.icon}
-                        </span>
-                        {lfo.name}
-                    </div>
-                ))}
-            </div>
-
-            {lfoManager.lfos.length === 0 && (
-                <div style={{ color: '#666', fontSize: '0.9em', textAlign: 'center', padding: '10px' }}>
-                    No LFOs created yet. Click "Add LFO" to create one.
-                </div>
-            )}
-
-            {/* Selected LFO Editor */}
-            {selectedLfo && (
-                <div style={{ background: '#252540', padding: '10px', borderRadius: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <input
-                            type="text"
-                            value={selectedLfo.name}
-                            onChange={(e) => handleLFOChange(selectedLfo, 'name', e.target.value)}
-                            style={{
-                                background: '#333',
-                                border: '1px solid #555',
-                                color: 'white',
-                                padding: '4px',
-                                borderRadius: '2px',
-                                width: '120px',
-                            }}
-                        />
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                            <button
-                                onClick={() => handleLFOChange(selectedLfo, 'enabled', !selectedLfo.enabled)}
-                                style={{
-                                    background: selectedLfo.enabled ? '#4a4' : '#666',
-                                    border: 'none',
-                                    color: 'white',
-                                    padding: '4px 8px',
-                                    cursor: 'pointer',
-                                    borderRadius: '2px',
-                                    fontSize: '0.8em',
-                                }}
-                            >
-                                {selectedLfo.enabled ? 'ON' : 'OFF'}
-                            </button>
-                            <button
-                                onClick={() => handleDeleteLFO(selectedLfo.id)}
-                                style={{
-                                    background: '#a44',
-                                    border: 'none',
-                                    color: 'white',
-                                    padding: '4px 8px',
-                                    cursor: 'pointer',
-                                    borderRadius: '2px',
-                                    fontSize: '0.8em',
-                                }}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Waveform Selector */}
-                    <div style={{ marginBottom: '10px' }}>
-                        <label style={{ fontSize: '0.8em', color: '#888' }}>Waveform</label>
-                        <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
-                            {waveformOptions.map(opt => (
-                                <button
-                                    key={opt.value}
-                                    onClick={() => handleLFOChange(selectedLfo, 'waveform', opt.value)}
-                                    title={opt.label}
-                                    style={{
-                                        background: selectedLfo.waveform === opt.value ? '#666' : '#444',
-                                        border: 'none',
-                                        color: 'white',
-                                        padding: '6px 10px',
-                                        cursor: 'pointer',
-                                        borderRadius: '2px',
-                                        fontSize: '1em',
-                                    }}
-                                >
-                                    {opt.icon}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Parameters */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div>
-                            <label style={{ fontSize: '0.8em', color: '#888' }}>Frequency (Hz)</label>
-                            <input
-                                type="range"
-                                min="0.01"
-                                max="20"
-                                step="0.01"
-                                value={selectedLfo.frequency}
-                                onChange={(e) => handleLFOChange(selectedLfo, 'frequency', parseFloat(e.target.value))}
-                                style={{ width: '100%' }}
-                            />
-                            <span style={{ fontSize: '0.8em' }}>{selectedLfo.frequency.toFixed(2)}</span>
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '0.8em', color: '#888' }}>Amplitude</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={selectedLfo.amplitude}
-                                onChange={(e) => handleLFOChange(selectedLfo, 'amplitude', parseFloat(e.target.value))}
-                                style={{ width: '100%' }}
-                            />
-                            <span style={{ fontSize: '0.8em' }}>{selectedLfo.amplitude.toFixed(2)}</span>
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '0.8em', color: '#888' }}>Offset</label>
-                            <input
-                                type="range"
-                                min="-1"
-                                max="1"
-                                step="0.01"
-                                value={selectedLfo.offset}
-                                onChange={(e) => handleLFOChange(selectedLfo, 'offset', parseFloat(e.target.value))}
-                                style={{ width: '100%' }}
-                            />
-                            <span style={{ fontSize: '0.8em' }}>{selectedLfo.offset.toFixed(2)}</span>
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '0.8em', color: '#888' }}>Phase</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max={Math.PI * 2}
-                                step="0.01"
-                                value={selectedLfo.phase}
-                                onChange={(e) => handleLFOChange(selectedLfo, 'phase', parseFloat(e.target.value))}
-                                style={{ width: '100%' }}
-                            />
-                            <span style={{ fontSize: '0.8em' }}>{(selectedLfo.phase / Math.PI).toFixed(2)}π</span>
-                        </div>
-                    </div>
-
-                    {/* Map Button */}
+        <div className="console-panel" style={{ maxHeight: '260px' }}>
+            <div className="console-panel-header">
+                <span>LFO Modulation</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className={`led-indicator ${lfoManager.lfos.length > 0 ? 'active' : ''}`} />
                     <button
-                        onClick={() => startMapping(selectedLfo.id)}
-                        style={{
-                            marginTop: '10px',
-                            width: '100%',
-                            background: mappingMode && mappingLfoId === selectedLfo.id ? '#a84' : '#448',
-                            border: 'none',
-                            color: 'white',
-                            padding: '8px',
-                            cursor: 'pointer',
-                            borderRadius: '4px',
-                        }}
+                        onClick={handleCreateLFO}
+                        className="vm-button vm-button-primary"
+                        style={{ fontSize: '9px', padding: '4px 8px' }}
                     >
-                        {mappingMode && mappingLfoId === selectedLfo.id ? 'Click a parameter below...' : '🔗 Map to Parameter'}
+                        + ADD LFO
                     </button>
                 </div>
-            )}
+            </div>
 
-            {/* Mapping Target Selection */}
-            {mappingMode && (
-                <div style={{ marginTop: '10px', padding: '10px', background: '#2a2a3a', borderRadius: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                        <span style={{ fontSize: '0.9em', color: '#aaa' }}>Select a parameter to modulate:</span>
-                        <button
-                            onClick={cancelMapping}
+            <div className="console-panel-content" style={{ display: 'flex', gap: '8px' }}>
+                {/* LFO List */}
+                <div style={{
+                    width: '120px',
+                    borderRight: '1px solid var(--vm-panel-border)',
+                    paddingRight: '8px',
+                }}>
+                    {lfoManager.lfos.length === 0 && (
+                        <div style={{
+                            color: 'var(--vm-text-dim)',
+                            fontSize: '10px',
+                            textAlign: 'center',
+                            padding: '12px 4px',
+                            fontFamily: 'var(--font-label)',
+                        }}>
+                            NO LFOs
+                        </div>
+                    )}
+                    {lfoManager.lfos.map(lfo => (
+                        <div
+                            key={lfo.id}
+                            onClick={() => setSelectedLfoId(lfo.id)}
                             style={{
-                                background: '#666',
-                                border: 'none',
-                                color: 'white',
-                                padding: '2px 8px',
+                                padding: '6px 8px',
+                                background: selectedLfoId === lfo.id
+                                    ? 'var(--vm-enclosure-mid)'
+                                    : 'transparent',
+                                border: selectedLfoId === lfo.id
+                                    ? '1px solid var(--vm-enclosure-light)'
+                                    : '1px solid transparent',
+                                borderRadius: '3px',
                                 cursor: 'pointer',
-                                borderRadius: '2px',
-                                fontSize: '0.8em',
+                                marginBottom: '4px',
+                                opacity: lfo.enabled ? 1 : 0.4,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                fontFamily: 'var(--font-label)',
+                                fontSize: '10px',
+                                letterSpacing: '0.05em',
                             }}
                         >
-                            Cancel
-                        </button>
-                    </div>
-                    {effects.map(effect => (
-                        <div key={effect.id} style={{ marginBottom: '10px' }}>
-                            <div style={{ fontSize: '0.9em', fontWeight: 'bold', marginBottom: '5px' }}>{effect.name}</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                                {effect.parameters.filter(p => p.type === 'float').map(param => {
-                                    const isModulated = lfoManager.isParameterModulated(effect.id, param.id);
-                                    return (
-                                        <button
-                                            key={param.id}
-                                            onClick={() => handleMapParameter(effect.id, param.id, param.min || 0, param.max || 1)}
-                                            style={{
-                                                background: isModulated ? '#664' : '#444',
-                                                border: isModulated ? '1px solid #886' : '1px solid transparent',
-                                                color: 'white',
-                                                padding: '4px 8px',
-                                                cursor: 'pointer',
-                                                borderRadius: '2px',
-                                                fontSize: '0.8em',
-                                            }}
-                                        >
-                                            {param.label} {isModulated && '⟳'}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                            <span style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '11px',
+                                opacity: 0.6,
+                            }}>
+                                {waveformOptions.find(w => w.value === lfo.waveform)?.icon}
+                            </span>
+                            {lfo.name}
                         </div>
                     ))}
                 </div>
-            )}
+
+                {/* Selected LFO Editor */}
+                <div style={{ flex: 1 }}>
+                    {!selectedLfo && (
+                        <div style={{
+                            color: 'var(--vm-text-dim)',
+                            fontSize: '10px',
+                            textAlign: 'center',
+                            padding: '24px',
+                            fontFamily: 'var(--font-label)',
+                        }}>
+                            SELECT AN LFO
+                        </div>
+                    )}
+
+                    {selectedLfo && (
+                        <div>
+                            {/* Header */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: '10px',
+                            }}>
+                                <input
+                                    type="text"
+                                    value={selectedLfo.name}
+                                    onChange={(e) => handleLFOChange(selectedLfo, 'name', e.target.value)}
+                                    className="vm-input"
+                                    style={{ width: '100px', fontSize: '11px', padding: '4px 8px' }}
+                                />
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                    <button
+                                        onClick={() => handleLFOChange(selectedLfo, 'enabled', !selectedLfo.enabled)}
+                                        className={`vm-button vm-button-led ${selectedLfo.enabled ? 'active' : ''}`}
+                                        style={{
+                                            fontSize: '9px',
+                                            padding: '4px 8px',
+                                            background: selectedLfo.enabled
+                                                ? 'linear-gradient(180deg, var(--vm-accent-success) 0%, #228833 100%)'
+                                                : 'var(--vm-enclosure-mid)',
+                                        }}
+                                    >
+                                        {selectedLfo.enabled ? 'ON' : 'OFF'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteLFO(selectedLfo.id)}
+                                        className="vm-button vm-button-danger"
+                                        style={{ fontSize: '9px', padding: '4px 8px' }}
+                                    >
+                                        DEL
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Waveform Selector */}
+                            <div style={{ marginBottom: '10px' }}>
+                                <label style={{
+                                    fontFamily: 'var(--font-label)',
+                                    fontSize: '9px',
+                                    color: 'var(--vm-silkscreen-dim)',
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    display: 'block',
+                                    marginBottom: '4px',
+                                }}>
+                                    WAVEFORM
+                                </label>
+                                <div style={{ display: 'flex', gap: '3px' }}>
+                                    {waveformOptions.map(opt => (
+                                        <button
+                                            key={opt.value}
+                                            onClick={() => handleLFOChange(selectedLfo, 'waveform', opt.value)}
+                                            title={opt.label}
+                                            className="vm-button"
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '11px',
+                                                fontFamily: 'var(--font-mono)',
+                                                background: selectedLfo.waveform === opt.value
+                                                    ? 'var(--vm-accent-secondary)'
+                                                    : 'var(--vm-enclosure-mid)',
+                                            }}
+                                        >
+                                            {opt.icon}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Parameters Grid */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '8px',
+                            }}>
+                                {/* Frequency */}
+                                <div>
+                                    <label style={{
+                                        fontFamily: 'var(--font-label)',
+                                        fontSize: '9px',
+                                        color: 'var(--vm-silkscreen-dim)',
+                                        letterSpacing: '0.1em',
+                                        display: 'block',
+                                        marginBottom: '2px',
+                                    }}>
+                                        FREQ (HZ)
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <input
+                                            type="range"
+                                            min="0.01"
+                                            max="20"
+                                            step="0.01"
+                                            value={selectedLfo.frequency}
+                                            onChange={(e) => handleLFOChange(selectedLfo, 'frequency', parseFloat(e.target.value))}
+                                            className="vm-fader"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span className="vm-lcd vm-lcd-small" style={{
+                                            fontSize: '11px',
+                                            padding: '2px 4px',
+                                            minWidth: '40px',
+                                            textAlign: 'right',
+                                        }}>
+                                            {selectedLfo.frequency.toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Amplitude */}
+                                <div>
+                                    <label style={{
+                                        fontFamily: 'var(--font-label)',
+                                        fontSize: '9px',
+                                        color: 'var(--vm-silkscreen-dim)',
+                                        letterSpacing: '0.1em',
+                                        display: 'block',
+                                        marginBottom: '2px',
+                                    }}>
+                                        AMPLITUDE
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="1"
+                                            step="0.01"
+                                            value={selectedLfo.amplitude}
+                                            onChange={(e) => handleLFOChange(selectedLfo, 'amplitude', parseFloat(e.target.value))}
+                                            className="vm-fader"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span className="vm-lcd vm-lcd-small" style={{
+                                            fontSize: '11px',
+                                            padding: '2px 4px',
+                                            minWidth: '40px',
+                                            textAlign: 'right',
+                                        }}>
+                                            {selectedLfo.amplitude.toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Offset */}
+                                <div>
+                                    <label style={{
+                                        fontFamily: 'var(--font-label)',
+                                        fontSize: '9px',
+                                        color: 'var(--vm-silkscreen-dim)',
+                                        letterSpacing: '0.1em',
+                                        display: 'block',
+                                        marginBottom: '2px',
+                                    }}>
+                                        OFFSET
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <input
+                                            type="range"
+                                            min="-1"
+                                            max="1"
+                                            step="0.01"
+                                            value={selectedLfo.offset}
+                                            onChange={(e) => handleLFOChange(selectedLfo, 'offset', parseFloat(e.target.value))}
+                                            className="vm-fader"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span className="vm-lcd vm-lcd-small" style={{
+                                            fontSize: '11px',
+                                            padding: '2px 4px',
+                                            minWidth: '40px',
+                                            textAlign: 'right',
+                                        }}>
+                                            {selectedLfo.offset.toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Phase */}
+                                <div>
+                                    <label style={{
+                                        fontFamily: 'var(--font-label)',
+                                        fontSize: '9px',
+                                        color: 'var(--vm-silkscreen-dim)',
+                                        letterSpacing: '0.1em',
+                                        display: 'block',
+                                        marginBottom: '2px',
+                                    }}>
+                                        PHASE
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max={Math.PI * 2}
+                                            step="0.01"
+                                            value={selectedLfo.phase}
+                                            onChange={(e) => handleLFOChange(selectedLfo, 'phase', parseFloat(e.target.value))}
+                                            className="vm-fader"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span className="vm-lcd vm-lcd-small" style={{
+                                            fontSize: '11px',
+                                            padding: '2px 4px',
+                                            minWidth: '40px',
+                                            textAlign: 'right',
+                                        }}>
+                                            {(selectedLfo.phase / Math.PI).toFixed(1)}pi
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Map Button */}
+                            <button
+                                onClick={() => startMapping(selectedLfo.id)}
+                                className="vm-button"
+                                style={{
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    background: mappingMode && mappingLfoId === selectedLfo.id
+                                        ? 'var(--vm-accent-warning)'
+                                        : 'var(--vm-accent-secondary)',
+                                    color: mappingMode && mappingLfoId === selectedLfo.id ? '#000' : '#fff',
+                                }}
+                            >
+                                {mappingMode && mappingLfoId === selectedLfo.id
+                                    ? 'SELECT PARAMETER BELOW...'
+                                    : 'MAP TO PARAMETER'}
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Mapping Target Selection */}
+                {mappingMode && (
+                    <div style={{
+                        width: '180px',
+                        borderLeft: '1px solid var(--vm-panel-border)',
+                        paddingLeft: '8px',
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '8px',
+                        }}>
+                            <span style={{
+                                fontFamily: 'var(--font-label)',
+                                fontSize: '9px',
+                                color: 'var(--vm-silkscreen)',
+                                letterSpacing: '0.1em',
+                            }}>
+                                SELECT TARGET
+                            </span>
+                            <button
+                                onClick={cancelMapping}
+                                className="vm-button"
+                                style={{ fontSize: '9px', padding: '2px 6px' }}
+                            >
+                                X
+                            </button>
+                        </div>
+                        <div style={{ maxHeight: '160px', overflowY: 'auto' }}>
+                            {effects.map(effect => (
+                                <div key={effect.id} style={{ marginBottom: '8px' }}>
+                                    <div style={{
+                                        fontFamily: 'var(--font-label)',
+                                        fontSize: '9px',
+                                        color: 'var(--vm-silkscreen)',
+                                        letterSpacing: '0.05em',
+                                        marginBottom: '4px',
+                                    }}>
+                                        {effect.name}
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                                        {effect.parameters.filter(p => p.type === 'float').map(param => {
+                                            const isModulated = lfoManager.isParameterModulated(effect.id, param.id);
+                                            return (
+                                                <button
+                                                    key={param.id}
+                                                    onClick={() => handleMapParameter(effect.id, param.id, param.min || 0, param.max || 1)}
+                                                    className="vm-button"
+                                                    style={{
+                                                        fontSize: '9px',
+                                                        padding: '3px 6px',
+                                                        background: isModulated
+                                                            ? 'var(--vm-accent-warning)'
+                                                            : 'var(--vm-enclosure-mid)',
+                                                        color: isModulated ? '#000' : 'var(--vm-text-secondary)',
+                                                    }}
+                                                >
+                                                    {param.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* Current Mappings */}
             {lfoManager.mappings.length > 0 && !mappingMode && (
-                <div style={{ marginTop: '10px' }}>
-                    <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '5px' }}>Active Mappings:</div>
-                    {lfoManager.mappings.map((mapping, idx) => {
-                        const lfo = lfoManager.getLFO(mapping.lfoId);
-                        const effect = effects.find(e => e.id === mapping.effectId);
-                        const param = effect?.parameters.find(p => p.id === mapping.parameterId);
-                        if (!lfo || !effect || !param) return null;
-                        return (
-                            <div
-                                key={idx}
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '4px 8px',
-                                    background: '#333',
-                                    borderRadius: '2px',
-                                    marginBottom: '2px',
-                                    fontSize: '0.85em',
-                                }}
-                            >
-                                <span>
-                                    {lfo.name} → {effect.name}.{param.label}
-                                </span>
-                                <button
-                                    onClick={() => handleUnmapParameter(mapping.effectId, mapping.parameterId)}
+                <div style={{
+                    borderTop: '1px solid var(--vm-panel-border)',
+                    padding: '8px',
+                    maxHeight: '60px',
+                    overflowY: 'auto',
+                }}>
+                    <div style={{
+                        fontFamily: 'var(--font-label)',
+                        fontSize: '9px',
+                        color: 'var(--vm-silkscreen-dim)',
+                        marginBottom: '4px',
+                        letterSpacing: '0.1em',
+                    }}>
+                        ACTIVE MAPPINGS
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {lfoManager.mappings.map((mapping, idx) => {
+                            const lfo = lfoManager.getLFO(mapping.lfoId);
+                            const effect = effects.find(e => e.id === mapping.effectId);
+                            const param = effect?.parameters.find(p => p.id === mapping.parameterId);
+                            if (!lfo || !effect || !param) return null;
+                            return (
+                                <div
+                                    key={idx}
                                     style={{
-                                        background: '#a44',
-                                        border: 'none',
-                                        color: 'white',
-                                        padding: '2px 6px',
-                                        cursor: 'pointer',
-                                        borderRadius: '2px',
-                                        fontSize: '0.8em',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '3px 8px',
+                                        background: 'var(--vm-enclosure-dark)',
+                                        borderRadius: '3px',
+                                        border: '1px solid var(--vm-panel-border)',
+                                        fontFamily: 'var(--font-mono)',
+                                        fontSize: '10px',
+                                        color: 'var(--vm-text-secondary)',
                                     }}
                                 >
-                                    ✕
-                                </button>
-                            </div>
-                        );
-                    })}
+                                    <span style={{ color: 'var(--vm-accent-warning)' }}>{lfo.name}</span>
+                                    <span style={{ opacity: 0.5 }}>→</span>
+                                    <span>{effect.name}.{param.label}</span>
+                                    <button
+                                        onClick={() => handleUnmapParameter(mapping.effectId, mapping.parameterId)}
+                                        style={{
+                                            background: 'var(--vm-accent-danger)',
+                                            border: 'none',
+                                            color: 'white',
+                                            padding: '1px 4px',
+                                            cursor: 'pointer',
+                                            borderRadius: '2px',
+                                            fontSize: '9px',
+                                            marginLeft: '4px',
+                                        }}
+                                    >
+                                        x
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </div>
