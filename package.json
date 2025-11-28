@@ -1,0 +1,15 @@
+{
+    "name": "lzx-clone-root",
+    "version": "1.0.0",
+    "description": "Root of the Digital Videomancer project",
+    "private": true,
+    "scripts": {
+        "install:app": "cd digital-videomancer && npm install",
+        "dev": "cd digital-videomancer && npm run dev",
+        "build": "cd digital-videomancer && npm run build",
+        "lint": "cd digital-videomancer && npm run lint"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
