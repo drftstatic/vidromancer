@@ -13,6 +13,7 @@ import { MidiManager } from './renderer/services/MidiManager'
 import { LFOManager } from './renderer/engine/modulation/LFOManager'
 import { MidiSettings } from './renderer/components/MidiSettings'
 import { RecorderManager } from './renderer/services/RecorderManager'
+import { PlasmaMixTube } from './renderer/components/PlasmaMixTube'
 
 function App() {
   const sourceManager = useMemo(() => new SourceManager(), []);
@@ -150,7 +151,7 @@ function App() {
 
         <div className="lcd-status">
           <div className="lcd-status-display">
-            VIDROMANCER v1.0
+            VIDROMANCER v0.1
           </div>
         </div>
 
@@ -187,34 +188,32 @@ function App() {
           />
         </div>
 
-        {/* Right Panel - Parameters */}
+        {/* Right Panel - Mix (top 1/3) & Parameters (bottom 2/3) */}
         <div className="right-panel">
+          {/* Mix Section - Top 1/3 */}
+          <div className="mix-section">
+            <div className="console-panel mix-panel">
+              <div className="console-panel-header">
+                <span>Mix</span>
+                <div className="led-indicator active" />
+              </div>
+              <div className="mix-panel-content">
+                <div className="mix-labels">
+                  <span className="mix-label-a">A</span>
+                  <span className="mix-label-b">B</span>
+                </div>
+                <PlasmaMixTube mixValue={mixValue} />
+              </div>
+            </div>
+          </div>
+
+          {/* Parameter Section - Bottom 2/3 */}
           <div className="parameter-section">
             <ParameterPanel
               effect={selectedEffect}
               midiManager={midiManager}
               lfoManager={lfoManager}
             />
-          </div>
-
-          {/* T-Bar Visual Indicator */}
-          <div className="tbar-section">
-            <span className="tbar-label">MIX</span>
-            <div className="tbar-track">
-              <div
-                className="tbar-indicator"
-                style={{ top: `${8 + mixValue * 184}px` }}
-              />
-              <div className="tbar-notches">
-                {Array.from({ length: 11 }).map((_, i) => (
-                  <div key={i} className="tbar-notch" />
-                ))}
-              </div>
-            </div>
-            <div className="tbar-labels">
-              <span>A</span>
-              <span>B</span>
-            </div>
           </div>
         </div>
       </div>

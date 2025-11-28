@@ -1,7 +1,8 @@
 {
   "name": "vidromancer",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "type": "module",
   "description": "Video Effects Console - A Fladry Creative Experiment",
   "author": "Fladry Creative <hello@fladrycreative.com>",
   "homepage": "https://fladrycreative.com",

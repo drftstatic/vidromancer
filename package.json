@@ -1,6 +1,6 @@
 {
     "name": "vidromancer-root",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "Root of the Vidromancer project",
     "private": true,
     "scripts": {
@@ -10,6 +10,6 @@
         "lint": "cd vidromancer && npm run lint"
     },
     "keywords": [],
-    "author": "",
+    "author": "Fladry Creative",
     "license": "ISC"
 }

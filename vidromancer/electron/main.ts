@@ -70,7 +70,7 @@ app.on('activate', () => {
 
 app.whenReady().then(() => {
   // Handle permission requests for media devices (webcam, microphone)
-  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
     const allowedPermissions = ['media', 'mediaKeySystem', 'geolocation', 'notifications', 'fullscreen', 'pointerLock']
     if (allowedPermissions.includes(permission)) {
       callback(true)
@@ -80,7 +80,7 @@ app.whenReady().then(() => {
   })
 
   // Handle permission check requests
-  session.defaultSession.setPermissionCheckHandler((webContents, permission) => {
+  session.defaultSession.setPermissionCheckHandler((_webContents, permission) => {
     const allowedPermissions = ['media', 'mediaKeySystem', 'geolocation', 'notifications', 'fullscreen', 'pointerLock']
     return allowedPermissions.includes(permission)
   })

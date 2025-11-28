@@ -32,7 +32,7 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
         const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
         const geometry = new THREE.PlaneGeometry(2, 2);
         const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        const quad = new THREE.Mesh(geometry, material);
+        const quad = new THREE.Mesh(geometry, material as THREE.Material);
         scene.add(quad);
 
         // Create FBOs for effect chain
