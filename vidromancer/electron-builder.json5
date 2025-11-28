@@ -4,6 +4,7 @@
   "appId": "com.fladrycreative.vidromancer",
   "asar": true,
   "productName": "Vidromancer",
+  "icon": "build/icon.png",
   "directories": {
     "output": "release/${version}"
   },
