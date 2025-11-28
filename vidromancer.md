@@ -1,10 +1,12 @@
-Product Requirements Document (PRD): Digital Videomancer
+Product Requirements Document (PRD): Vidromancer
+
+A Fladry Creative Experiment | fladrycreative.com
 
 1. Overview
 
-Product: Digital Videomancer (standalone app/plugin/web/FPGA hybrid)
+Product: Vidromancer (standalone app/plugin/web/FPGA hybrid)
 
-Objective: Deliver a self-contained video effect instrument inspired by the LZX Videomancer, enabling real-time effect manipulation, low-latency I/O, and modular creative workflows for motion artists, VJs, and content creators.
+Objective: Deliver a self-contained video effect instrument with hardware-inspired interface, enabling real-time effect manipulation, low-latency I/O, and modular creative workflows for motion artists, VJs, and content creators.
 
 Stakeholders: Product Owner, Design Lead, Engineering Lead, QA, Beta Testers, Digital Artists
 

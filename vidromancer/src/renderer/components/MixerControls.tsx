@@ -10,6 +10,7 @@ interface MixerControlsProps {
 
 export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManager }) => {
     const handleSourceChange = async (slot: 'A' | 'B', type: VideoSourceType) => {
+        console.log('[MixerControls] handleSourceChange called:', slot, type);
         if (slot === 'A') {
             if (type === 'file') {
                 const input = document.createElement('input');

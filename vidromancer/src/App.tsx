@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import './App.css'
 import { SourceManager } from './renderer/engine/SourceManager'
 import { Mixer } from './renderer/engine/Mixer'
@@ -25,13 +25,33 @@ function App() {
   const [selectedEffect, setSelectedEffect] = useState<Effect | null>(null);
   const [, setTick] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [mixValue, setMixValue] = useState(0);
+  const [hasMidiDevice, setHasMidiDevice] = useState(false);
+  const [hasVideoSource, setHasVideoSource] = useState(false);
+
+  const checkConnections = useCallback(() => {
+    setHasMidiDevice(midiManager.inputs.length > 0);
+    setHasVideoSource(sourceManager.sourceA !== null || sourceManager.sourceB !== null);
+  }, [midiManager, sourceManager]);
 
   useEffect(() => {
-    midiManager.init();
+    midiManager.init().then(() => {
+      checkConnections();
+    });
+
+    const interval = setInterval(checkConnections, 1000);
+
     return () => {
+      clearInterval(interval);
       sourceManager.dispose();
     };
-  }, [sourceManager, midiManager]);
+  }, [sourceManager, midiManager, checkConnections]);
+
+  const handleMixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setMixValue(value);
+    mixer.setMixRatio(value);
+  };
 
   const handleUpdate = () => {
     setTick(t => t + 1);
@@ -65,7 +85,7 @@ function App() {
 
     win.document.body.style.margin = '0';
     win.document.body.style.background = 'black';
-    win.document.title = 'Digital Videomancer Output';
+    win.document.title = 'Vidromancer Output';
 
     const newCanvas = win.document.createElement('canvas');
     newCanvas.width = 1280;
@@ -87,14 +107,14 @@ function App() {
   };
 
   return (
-    <div className="videomancer-console">
+    <div className="vidromancer-console">
       {/* Top Jack Strip - I/O Connectors */}
       <div className="jack-strip">
         <div className="panel-screw" />
 
-        <div className="brand-logo">
+        <div className="brand-logo" title="A Fladry Creative Experiment">
           <span className="star">*</span>
-          videomancer
+          vidromancer
           <span className="star">*</span>
         </div>
 
@@ -112,7 +132,7 @@ function App() {
 
         <div className="jack-group">
           <span className="jack-group-label">MIDI</span>
-          <div className="jack-connector active" title="MIDI In" />
+          <div className={`jack-connector ${hasMidiDevice ? 'active' : ''}`} title="MIDI In" />
           <div className="jack-connector" title="MIDI Out" />
         </div>
 
@@ -120,13 +140,13 @@ function App() {
 
         <div className="jack-group">
           <span className="jack-group-label">VIDEO</span>
-          <div className="jack-connector active" title="HDMI In" />
-          <div className="jack-connector" title="Composite" />
+          <div className={`jack-connector ${hasVideoSource ? 'active' : ''}`} title="Video In" />
+          <div className="jack-connector" title="Video Out" />
         </div>
 
         <div className="lcd-status">
           <div className="lcd-status-display">
-            VIDEOMANCER v1.0
+            VIDROMANCER v1.0
           </div>
         </div>
 
@@ -177,6 +197,16 @@ function App() {
           <div className="tbar-section">
             <span className="tbar-label">MIX</span>
             <div className="tbar-track">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={mixValue}
+                onChange={handleMixChange}
+                className="tbar-slider"
+                orient="vertical"
+              />
               <div className="tbar-notches">
                 {Array.from({ length: 11 }).map((_, i) => (
                   <div key={i} className="tbar-notch" />

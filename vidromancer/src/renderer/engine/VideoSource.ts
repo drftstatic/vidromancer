@@ -22,22 +22,32 @@ export class VideoSource {
   }
 
   async setSource(type: VideoSourceType, url?: string) {
+    console.log('[VideoSource] setSource called:', type, url);
     this.stop();
     this.type = type;
 
     if (type === 'webcam') {
       try {
+        console.log('[VideoSource] Requesting webcam...');
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log('[VideoSource] Got webcam stream:', stream);
         this.video.srcObject = stream;
         await this.video.play();
+        console.log('[VideoSource] Webcam playing, video dimensions:', this.video.videoWidth, 'x', this.video.videoHeight);
       } catch (err) {
-        console.error('Error accessing webcam:', err);
+        console.error('[VideoSource] Error accessing webcam:', err);
         this.type = 'none';
       }
     } else if (type === 'file' && url) {
+      console.log('[VideoSource] Loading file:', url);
       this.video.srcObject = null;
       this.video.src = url;
-      await this.video.play();
+      try {
+        await this.video.play();
+        console.log('[VideoSource] File playing, video dimensions:', this.video.videoWidth, 'x', this.video.videoHeight);
+      } catch (err) {
+        console.error('[VideoSource] Error playing file:', err);
+      }
     } else {
       this.type = 'none';
     }

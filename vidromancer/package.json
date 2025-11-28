@@ -1,7 +1,10 @@
 {
-  "name": "digital-videomancer",
+  "name": "vidromancer",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Video Effects Console - A Fladry Creative Experiment",
+  "author": "Fladry Creative <hello@fladrycreative.com>",
+  "homepage": "https://fladrycreative.com",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
