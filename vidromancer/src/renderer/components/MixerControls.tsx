@@ -6,9 +6,11 @@ import { VideoSourceType } from '../engine/VideoSource';
 interface MixerControlsProps {
     mixer: Mixer;
     sourceManager: SourceManager;
+    onMixChange?: (value: number) => void;
+    onSourceChange?: () => void;
 }
 
-export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManager }) => {
+export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManager, onMixChange, onSourceChange }) => {
     const handleSourceChange = async (slot: 'A' | 'B', type: VideoSourceType) => {
         console.log('[MixerControls] handleSourceChange called:', slot, type);
         if (slot === 'A') {
@@ -18,11 +20,15 @@ export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManag
                 input.accept = 'video/*';
                 input.onchange = async (e) => {
                     const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) await sourceManager.setSourceA('file', URL.createObjectURL(file));
+                    if (file) {
+                        await sourceManager.setSourceA('file', URL.createObjectURL(file));
+                        onSourceChange?.();
+                    }
                 };
                 input.click();
             } else {
                 await sourceManager.setSourceA(type);
+                onSourceChange?.();
             }
         } else {
             if (type === 'file') {
@@ -31,17 +37,23 @@ export const MixerControls: React.FC<MixerControlsProps> = ({ mixer, sourceManag
                 input.accept = 'video/*';
                 input.onchange = async (e) => {
                     const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) await sourceManager.setSourceB('file', URL.createObjectURL(file));
+                    if (file) {
+                        await sourceManager.setSourceB('file', URL.createObjectURL(file));
+                        onSourceChange?.();
+                    }
                 };
                 input.click();
             } else {
                 await sourceManager.setSourceB(type);
+                onSourceChange?.();
             }
         }
     };
 
     const handleMixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        mixer.setMixRatio(parseFloat(e.target.value));
+        const value = parseFloat(e.target.value);
+        mixer.setMixRatio(value);
+        onMixChange?.(value);
     };
 
     const handleBlendChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
