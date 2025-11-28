@@ -1,6 +1,6 @@
-# Digital Videomancer Landing Page
+# Vidromancer Landing Page
 
-This is the landing page for the Digital Videomancer beta.
+This is the landing page for the Vidromancer beta.
 
 ## Getting Started
 

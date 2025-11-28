@@ -27,11 +27,13 @@ function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [mixValue, setMixValue] = useState(0);
   const [hasMidiDevice, setHasMidiDevice] = useState(false);
-  const [hasVideoSource, setHasVideoSource] = useState(false);
+  const [hasSourceA, setHasSourceA] = useState(false);
+  const [hasSourceB, setHasSourceB] = useState(false);
 
   const checkConnections = useCallback(() => {
     setHasMidiDevice(midiManager.inputs.length > 0);
-    setHasVideoSource(sourceManager.sourceA !== null || sourceManager.sourceB !== null);
+    setHasSourceA(sourceManager.sourceA !== null);
+    setHasSourceB(sourceManager.sourceB !== null);
   }, [midiManager, sourceManager]);
 
   useEffect(() => {
@@ -47,10 +49,12 @@ function App() {
     };
   }, [sourceManager, midiManager, checkConnections]);
 
-  const handleMixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
+  const handleMixChange = (value: number) => {
     setMixValue(value);
-    mixer.setMixRatio(value);
+  };
+
+  const handleSourceChange = () => {
+    checkConnections();
   };
 
   const handleUpdate = () => {
@@ -140,8 +144,8 @@ function App() {
 
         <div className="jack-group">
           <span className="jack-group-label">VIDEO</span>
-          <div className={`jack-connector ${hasVideoSource ? 'active' : ''}`} title="Video In" />
-          <div className="jack-connector" title="Video Out" />
+          <div className={`jack-connector ${hasSourceA ? 'active' : ''}`} title="Source A" />
+          <div className={`jack-connector ${hasSourceB ? 'active' : ''}`} title="Source B" />
         </div>
 
         <div className="lcd-status">
@@ -193,19 +197,13 @@ function App() {
             />
           </div>
 
-          {/* T-Bar Fader */}
+          {/* T-Bar Visual Indicator */}
           <div className="tbar-section">
             <span className="tbar-label">MIX</span>
             <div className="tbar-track">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={mixValue}
-                onChange={handleMixChange}
-                className="tbar-slider"
-                orient="vertical"
+              <div
+                className="tbar-indicator"
+                style={{ top: `${8 + mixValue * 184}px` }}
               />
               <div className="tbar-notches">
                 {Array.from({ length: 11 }).map((_, i) => (
@@ -224,7 +222,12 @@ function App() {
       {/* Bottom Control Strip */}
       <div className="bottom-strip">
         <div className="mixer-section">
-          <MixerControls mixer={mixer} sourceManager={sourceManager} />
+          <MixerControls
+            mixer={mixer}
+            sourceManager={sourceManager}
+            onMixChange={handleMixChange}
+            onSourceChange={handleSourceChange}
+          />
         </div>
 
         <div className="transport-section">

@@ -1,13 +1,13 @@
 {
-    "name": "lzx-clone-root",
+    "name": "vidromancer-root",
     "version": "1.0.0",
-    "description": "Root of the Digital Videomancer project",
+    "description": "Root of the Vidromancer project",
     "private": true,
     "scripts": {
-        "install:app": "cd digital-videomancer && npm install",
-        "dev": "cd digital-videomancer && npm run dev",
-        "build": "cd digital-videomancer && npm run build",
-        "lint": "cd digital-videomancer && npm run lint"
+        "install:app": "cd vidromancer && npm install",
+        "dev": "cd vidromancer && npm run dev",
+        "build": "cd vidromancer && npm run build",
+        "lint": "cd vidromancer && npm run lint"
     },
     "keywords": [],
     "author": "",

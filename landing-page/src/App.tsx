@@ -39,8 +39,7 @@ function App() {
       <nav className="w-full py-6 z-10 glass sticky top-0">
         <div className="container flex justify-between items-center">
           <div className="text-2xl font-bold tracking-tighter">
-            <span className="text-white">DIGITAL</span>
-            <span className="gradient-text ml-2">VIDEOMANCER</span>
+            <span className="gradient-text">VIDROMANCER</span>
           </div>
           <div className="hidden md:flex gap-6 items-center">
             <a href="#features" className="text-sm font-medium hover:text-white transition-colors">Features</a>
@@ -132,7 +131,7 @@ function App() {
             <div>
               <h3 className="text-xl font-bold mb-3 text-orange-200">Experimental Software</h3>
               <p className="text-gray-400 mb-4">
-                Digital Videomancer is currently a <strong>proof of concept</strong>. It is free to use but expect bugs, incomplete features, and rough edges.
+                Vidromancer is currently a <strong>proof of concept</strong>. It is free to use but expect bugs, incomplete features, and rough edges.
                 Everything is still in the "baking" phase.
               </p>
               <p className="text-gray-400">
@@ -161,7 +160,7 @@ function App() {
       <footer className="py-12 border-t border-white/5 bg-black/40">
         <div className="container flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-center md:text-left">
-            <h4 className="font-bold text-lg mb-2">Digital Videomancer</h4>
+            <h4 className="font-bold text-lg mb-2">Vidromancer</h4>
             <p className="text-gray-500 text-sm">A Fladry Creative Experiment</p>
           </div>
 

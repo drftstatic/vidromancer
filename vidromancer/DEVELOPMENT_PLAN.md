@@ -1,8 +1,8 @@
-# Digital Videomancer - Development Plan
+# Vidromancer - Development Plan
 
 ## Overview
 
-This plan covers the implementation of 5 feature areas for the Digital Videomancer video effects application. UI/UX Polish will be handled separately using Google Stitch.
+This plan covers the implementation of 5 feature areas for the Vidromancer video effects application. UI/UX Polish will be handled separately using Google Stitch.
 
 **Priority Order:**
 1. More Effects (foundation - expands creative capabilities)

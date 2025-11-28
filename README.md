@@ -1,10 +1,11 @@
-# Digital Videomancer
+# Vidromancer
 
-This repository contains the source code for the Digital Videomancer project, a digital recreation of the LZX Videomancer hardware.
+A real-time video effects console for live visual performance and experimentation.
 
 ## Project Structure
 
-- `digital-videomancer/`: The main application code (Electron + Vite + React).
+- `vidromancer/`: The main Electron application (Electron + Vite + React + Three.js)
+- `landing-page/`: Marketing and beta sign-up page
 
 ## Getting Started
 
@@ -16,9 +17,9 @@ This repository contains the source code for the Digital Videomancer project, a 
 ### Installation
 
 1. Clone the repository (if you haven't already).
-2. Navigate to the project directory:
+2. Navigate to the app directory:
    ```bash
-   cd digital-videomancer
+   cd vidromancer
    ```
 3. Install dependencies:
    ```bash
@@ -43,7 +44,7 @@ To build the application for production:
 npm run build
 ```
 
-The output will be in the `digital-videomancer/dist` (renderer) and `digital-videomancer/release` (executable) directories.
+The output will be in the `vidromancer/dist` (renderer) and `vidromancer/release` (executable) directories.
 
 ## Best Practices
 
@@ -54,7 +55,7 @@ The output will be in the `digital-videomancer/dist` (renderer) and `digital-vid
 ## Multi-Machine Setup
 
 1. **Clone**: `git clone <repo-url>`
-2. **Install**: `cd digital-videomancer && npm install`
+2. **Install**: `cd vidromancer && npm install`
 3. **Run**: `npm run dev`
 
 Note: `node_modules` and build artifacts are not shared via git, so you must install dependencies on each machine.

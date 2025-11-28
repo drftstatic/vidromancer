@@ -36,7 +36,7 @@ export const OutputControls: React.FC<OutputControlsProps> = ({ recorderManager 
 
         win.document.body.style.margin = '0';
         win.document.body.style.background = 'black';
-        win.document.title = 'Digital Videomancer Output';
+        win.document.title = 'Vidromancer Output';
 
         const newCanvas = win.document.createElement('canvas');
         newCanvas.width = 1280;
