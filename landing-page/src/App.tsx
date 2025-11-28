@@ -265,8 +265,14 @@ function App() {
               </div>
 
               <div className="download-note">
-                <span className="note-label">NOTE:</span>
-                <span className="note-text">First launch: Right-click app → Open → Click "Open" in dialog</span>
+                <span className="note-label">⚠️ IMPORTANT:</span>
+                <span className="note-text">This is unsigned beta software. After installing, open Terminal and run:</span>
+              </div>
+              <div className="download-command">
+                <code>xattr -cr /Applications/Vidromancer.app</code>
+              </div>
+              <div className="download-note-sub">
+                <span className="note-text">Then you can open the app normally. You only need to do this once.</span>
               </div>
             </div>
 

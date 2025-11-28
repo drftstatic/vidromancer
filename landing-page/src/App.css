@@ -661,7 +661,7 @@
   padding: var(--space-sm) var(--space-md);
   background: rgba(255, 204, 0, 0.1);
   border: 1px solid rgba(255, 204, 0, 0.3);
-  border-radius: 4px;
+  border-radius: 4px 4px 0 0;
   font-size: 0.6875rem;
   letter-spacing: 0.05em;
 }
@@ -669,10 +669,39 @@
 .note-label {
   color: var(--phosphor-amber);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .note-text {
   color: var(--text-dim);
+}
+
+.download-command {
+  background: var(--crt-black);
+  border: 1px solid rgba(255, 204, 0, 0.3);
+  border-top: none;
+  padding: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.download-command code {
+  color: var(--phosphor-green);
+  user-select: all;
+  cursor: text;
+}
+
+.download-note-sub {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 204, 0, 0.05);
+  border: 1px solid rgba(255, 204, 0, 0.3);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
 }
 
 /* ===== TERMINAL WINDOW ===== */
