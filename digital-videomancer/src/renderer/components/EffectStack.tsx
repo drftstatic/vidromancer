@@ -10,13 +10,13 @@ interface EffectStackProps {
     onUpdate: () => void;
 }
 
-const categoryLabels: Record<string, string> = {
-    blur: '🔵 Blur',
-    distortion: '🌀 Distortion',
-    color: '🎨 Color',
-    stylize: '✨ Stylize',
-    key: '🔑 Key',
-    time: '⏱️ Time',
+const categoryIcons: Record<string, string> = {
+    blur: '~',
+    distortion: '@',
+    color: '#',
+    stylize: '*',
+    key: '%',
+    time: '&',
 };
 
 export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectId, onSelectEffect, onUpdate }) => {
@@ -51,165 +51,229 @@ export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectI
     const categories = getCategories();
 
     return (
-        <div style={{ width: '250px', background: '#222', color: '#eee', padding: '10px', display: 'flex', flexDirection: 'column', borderRight: '1px solid #444' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '1em' }}>Effects</h3>
+        <div className="console-panel" style={{ flex: 1 }}>
+            <div className="console-panel-header">
+                <span>Effects</span>
+                <div className={`led-indicator ${chain.getEffects().length > 0 ? 'active' : ''}`} />
+            </div>
 
-            {/* Add Effect Button */}
-            <div style={{ position: 'relative', marginBottom: '10px' }}>
-                <button
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    style={{
-                        width: '100%',
-                        padding: '8px',
-                        background: '#4a4',
-                        border: 'none',
-                        color: 'white',
-                        cursor: 'pointer',
-                        fontSize: '0.9em',
-                        borderRadius: '4px',
-                    }}
-                >
-                    + Add Effect
-                </button>
+            <div className="console-panel-content">
+                {/* Add Effect Button */}
+                <div style={{ position: 'relative', marginBottom: '8px' }}>
+                    <button
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        className="vm-button vm-button-primary"
+                        style={{ width: '100%' }}
+                    >
+                        + Add Effect
+                    </button>
 
-                {/* Effect Menu */}
-                {menuOpen && (
-                    <div style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        right: 0,
-                        background: '#333',
-                        border: '1px solid #555',
-                        borderRadius: '4px',
-                        zIndex: 100,
-                        maxHeight: '300px',
-                        overflowY: 'auto',
-                    }}>
-                        {categories.map(category => (
-                            <div key={category}>
-                                <div
-                                    onClick={() => setActiveCategory(activeCategory === category ? null : category)}
+                    {/* Effect Menu */}
+                    {menuOpen && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            background: 'var(--vm-enclosure-base)',
+                            border: '1px solid var(--vm-enclosure-light)',
+                            borderRadius: '4px',
+                            zIndex: 100,
+                            maxHeight: '280px',
+                            overflowY: 'auto',
+                            boxShadow: 'var(--vm-shadow-lg)',
+                            marginTop: '4px',
+                        }}>
+                            {categories.map(category => (
+                                <div key={category}>
+                                    <div
+                                        onClick={() => setActiveCategory(activeCategory === category ? null : category)}
+                                        style={{
+                                            padding: '8px 12px',
+                                            background: activeCategory === category ? 'var(--vm-enclosure-mid)' : 'transparent',
+                                            cursor: 'pointer',
+                                            borderBottom: '1px solid var(--vm-panel-border)',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            fontFamily: 'var(--font-label)',
+                                            fontSize: '11px',
+                                            letterSpacing: '0.08em',
+                                            textTransform: 'uppercase',
+                                            color: 'var(--vm-silkscreen)',
+                                            transition: 'background var(--vm-transition-fast)',
+                                        }}
+                                    >
+                                        <span>
+                                            <span style={{ marginRight: '8px', opacity: 0.6 }}>{categoryIcons[category]}</span>
+                                            {category}
+                                        </span>
+                                        <span style={{
+                                            transform: activeCategory === category ? 'rotate(90deg)' : 'none',
+                                            transition: 'transform var(--vm-transition-fast)',
+                                            opacity: 0.5,
+                                        }}>▶</span>
+                                    </div>
+                                    {activeCategory === category && (
+                                        <div style={{ background: 'var(--vm-enclosure-dark)' }}>
+                                            {getEffectsByCategory(category).map(effectName => (
+                                                <div
+                                                    key={effectName}
+                                                    onClick={() => addEffect(effectName)}
+                                                    style={{
+                                                        padding: '6px 16px 6px 28px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '12px',
+                                                        fontFamily: 'var(--font-label)',
+                                                        color: 'var(--vm-text-secondary)',
+                                                        borderBottom: '1px solid var(--vm-panel-border)',
+                                                        transition: 'all var(--vm-transition-fast)',
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.background = 'var(--vm-enclosure-mid)';
+                                                        e.currentTarget.style.color = 'var(--vm-text-primary)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.background = 'transparent';
+                                                        e.currentTarget.style.color = 'var(--vm-text-secondary)';
+                                                    }}
+                                                >
+                                                    {effectName}
+                                                    <span style={{
+                                                        fontSize: '10px',
+                                                        color: 'var(--vm-text-dim)',
+                                                        marginLeft: '8px',
+                                                        fontFamily: 'var(--font-mono)',
+                                                    }}>
+                                                        {effectRegistry[effectName]?.description}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Effect List */}
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                    {chain.getEffects().length === 0 && (
+                        <div style={{
+                            color: 'var(--vm-text-dim)',
+                            fontSize: '11px',
+                            textAlign: 'center',
+                            padding: '24px 12px',
+                            fontFamily: 'var(--font-label)',
+                            letterSpacing: '0.05em',
+                        }}>
+                            NO EFFECTS LOADED
+                            <br />
+                            <span style={{ fontSize: '10px', opacity: 0.6 }}>Click "+ Add Effect" to start</span>
+                        </div>
+                    )}
+                    {chain.getEffects().map((effect, index) => (
+                        <div
+                            key={effect.id}
+                            onClick={() => onSelectEffect(effect)}
+                            style={{
+                                padding: '8px 10px',
+                                marginBottom: '4px',
+                                background: effect.id === selectedEffectId
+                                    ? 'linear-gradient(180deg, var(--vm-enclosure-mid) 0%, var(--vm-enclosure-base) 100%)'
+                                    : 'var(--vm-enclosure-dark)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                borderRadius: '3px',
+                                border: effect.id === selectedEffectId
+                                    ? '1px solid var(--vm-enclosure-light)'
+                                    : '1px solid transparent',
+                                boxShadow: effect.id === selectedEffectId
+                                    ? 'var(--vm-shadow-sm)'
+                                    : 'none',
+                                transition: 'all var(--vm-transition-fast)',
+                            }}
+                        >
+                            <span style={{
+                                flex: 1,
+                                fontFamily: 'var(--font-label)',
+                                fontSize: '11px',
+                                letterSpacing: '0.05em',
+                                color: effect.id === selectedEffectId
+                                    ? 'var(--vm-text-accent)'
+                                    : 'var(--vm-text-secondary)',
+                            }}>
+                                <span style={{
+                                    opacity: 0.5,
+                                    marginRight: '8px',
+                                    fontFamily: 'var(--font-mono)',
+                                }}>{String(index + 1).padStart(2, '0')}</span>
+                                {effect.name}
+                            </span>
+                            <div style={{ display: 'flex', gap: '3px' }}>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); moveEffect(index, 'up'); }}
+                                    disabled={index === 0}
+                                    className="vm-button vm-button-square"
                                     style={{
-                                        padding: '8px',
-                                        background: activeCategory === category ? '#444' : 'transparent',
-                                        cursor: 'pointer',
-                                        borderBottom: '1px solid #444',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
+                                        width: '22px',
+                                        height: '22px',
+                                        fontSize: '10px',
+                                        opacity: index === 0 ? 0.3 : 1,
+                                        padding: 0,
                                     }}
                                 >
-                                    <span>{categoryLabels[category] || category}</span>
-                                    <span>{activeCategory === category ? '▼' : '▶'}</span>
-                                </div>
-                                {activeCategory === category && (
-                                    <div style={{ background: '#2a2a2a' }}>
-                                        {getEffectsByCategory(category).map(effectName => (
-                                            <div
-                                                key={effectName}
-                                                onClick={() => addEffect(effectName)}
-                                                style={{
-                                                    padding: '6px 16px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '0.9em',
-                                                }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = '#3a3a3a'}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                            >
-                                                {effectName}
-                                                <span style={{ fontSize: '0.7em', color: '#888', marginLeft: '8px' }}>
-                                                    {effectRegistry[effectName]?.description}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                    ▲
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); moveEffect(index, 'down'); }}
+                                    disabled={index === chain.getEffects().length - 1}
+                                    className="vm-button vm-button-square"
+                                    style={{
+                                        width: '22px',
+                                        height: '22px',
+                                        fontSize: '10px',
+                                        opacity: index === chain.getEffects().length - 1 ? 0.3 : 1,
+                                        padding: 0,
+                                    }}
+                                >
+                                    ▼
+                                </button>
+                                <button
+                                    onClick={(e) => removeEffect(e, effect.id)}
+                                    className="vm-button vm-button-danger vm-button-square"
+                                    style={{
+                                        width: '22px',
+                                        height: '22px',
+                                        fontSize: '10px',
+                                        padding: 0,
+                                    }}
+                                >
+                                    ×
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Effect List */}
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-                {chain.getEffects().length === 0 && (
-                    <div style={{ color: '#666', fontSize: '0.9em', textAlign: 'center', padding: '20px' }}>
-                        No effects added yet.<br />Click "Add Effect" to start.
-                    </div>
-                )}
-                {chain.getEffects().map((effect, index) => (
-                    <div
-                        key={effect.id}
-                        onClick={() => onSelectEffect(effect)}
-                        style={{
-                            padding: '8px',
-                            marginBottom: '4px',
-                            background: effect.id === selectedEffectId ? '#444' : '#333',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            borderRadius: '4px',
-                            border: effect.id === selectedEffectId ? '1px solid #666' : '1px solid transparent',
-                        }}
-                    >
-                        <span style={{ flex: 1 }}>{index + 1}. {effect.name}</span>
-                        <div style={{ display: 'flex', gap: '2px' }}>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); moveEffect(index, 'up'); }}
-                                disabled={index === 0}
-                                style={{
-                                    fontSize: '0.7em',
-                                    padding: '2px 5px',
-                                    background: index === 0 ? '#2a2a2a' : '#555',
-                                    border: 'none',
-                                    color: index === 0 ? '#666' : 'white',
-                                    cursor: index === 0 ? 'default' : 'pointer',
-                                    borderRadius: '2px',
-                                }}
-                            >
-                                ▲
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); moveEffect(index, 'down'); }}
-                                disabled={index === chain.getEffects().length - 1}
-                                style={{
-                                    fontSize: '0.7em',
-                                    padding: '2px 5px',
-                                    background: index === chain.getEffects().length - 1 ? '#2a2a2a' : '#555',
-                                    border: 'none',
-                                    color: index === chain.getEffects().length - 1 ? '#666' : 'white',
-                                    cursor: index === chain.getEffects().length - 1 ? 'default' : 'pointer',
-                                    borderRadius: '2px',
-                                }}
-                            >
-                                ▼
-                            </button>
-                            <button
-                                onClick={(e) => removeEffect(e, effect.id)}
-                                style={{
-                                    fontSize: '0.7em',
-                                    padding: '2px 5px',
-                                    background: '#a44',
-                                    border: 'none',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    borderRadius: '2px',
-                                }}
-                            >
-                                ✕
-                            </button>
                         </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Effect Count */}
-            {chain.getEffects().length > 0 && (
-                <div style={{ fontSize: '0.8em', color: '#666', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid #333' }}>
-                    {chain.getEffects().length} effect{chain.getEffects().length !== 1 ? 's' : ''} in chain
+                    ))}
                 </div>
-            )}
+
+                {/* Effect Count */}
+                {chain.getEffects().length > 0 && (
+                    <div style={{
+                        fontSize: '10px',
+                        color: 'var(--vm-text-dim)',
+                        textAlign: 'center',
+                        paddingTop: '8px',
+                        marginTop: '8px',
+                        borderTop: '1px solid var(--vm-panel-border)',
+                        fontFamily: 'var(--font-mono)',
+                    }}>
+                        {chain.getEffects().length} EFFECT{chain.getEffects().length !== 1 ? 'S' : ''} IN CHAIN
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

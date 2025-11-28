@@ -1,42 +1,504 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* ═══════════════════════════════════════════════════════════════════════════
+   DIGITAL VIDEOMANCER - Main Application Styles
+   Hardware Console Layout
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Main Console Container
+   ───────────────────────────────────────────────────────────────────────────── */
+.videomancer-console {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(60, 60, 60, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, #1e1e1e 0%, #141414 100%);
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Top Jack Strip (I/O Connectors)
+   ───────────────────────────────────────────────────────────────────────────── */
+.jack-strip {
+  height: 40px;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #0a0a0a;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.jack-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jack-group-label {
+  font-family: var(--font-label);
+  font-size: 9px;
+  color: var(--vm-silkscreen-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 4px;
+}
+
+.jack-connector {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #3a3a3a 0%, #1a1a1a 100%);
+  border: 2px solid #444;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+.jack-connector::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0a0a0a;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.jack-connector.active {
+  border-color: var(--vm-accent-secondary);
+}
+
+.jack-connector.active::after {
+  background: var(--vm-accent-secondary);
+  box-shadow: 0 0 6px var(--vm-led-blue-glow);
+}
+
+.strip-divider {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(180deg, transparent 0%, #444 50%, transparent 100%);
+  margin: 0 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Main Workspace Area
+   ───────────────────────────────────────────────────────────────────────────── */
+.console-workspace {
+  flex: 1;
+  display: flex;
+  padding: 12px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Left Panel - Effect Stack & MIDI
+   ───────────────────────────────────────────────────────────────────────────── */
+.left-panel {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Center Panel - Preview & Modulation
+   ───────────────────────────────────────────────────────────────────────────── */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Preview Monitor */
+.preview-monitor {
+  flex: 1;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.8),
+    0 4px 16px rgba(0, 0, 0, 0.6);
+  border: 3px solid #1a1a1a;
+}
+
+.preview-monitor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #333;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Monitor bezel effect */
+.preview-monitor::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border-radius: 6px;
+  z-index: -1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Right Panel - Parameters & T-Bar
+   ───────────────────────────────────────────────────────────────────────────── */
+.right-panel {
+  width: 280px;
+  display: flex;
+  gap: 8px;
+}
+
+.parameter-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* T-Bar Fader Section */
+.tbar-section {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  background: var(--vm-panel-base);
+  border-radius: 4px;
+  box-shadow: var(--vm-bevel-inset);
+}
+
+.tbar-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--vm-silkscreen);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.tbar-track {
+  flex: 1;
+  width: 8px;
+  background: #0a0a0a;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  position: relative;
+  margin: 8px 0;
+}
+
+.tbar-notches {
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.tbar-notch {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #444 30%, #444 70%, transparent 100%);
+}
+
+.tbar-thumb {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 16px;
+  background: linear-gradient(180deg, #666 0%, #4a4a4a 50%, #333 100%);
+  border-radius: 3px;
+  border: 1px solid #555;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+}
+
+.tbar-thumb::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: linear-gradient(90deg, #333 0%, #555 50%, #333 100%);
+  transform: translateY(-50%);
+}
+
+.tbar-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-label);
+  font-size: 10px;
+  color: var(--vm-silkscreen-dim);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Bottom Control Strip - Mixer & Transport
+   ───────────────────────────────────────────────────────────────────────────── */
+.bottom-strip {
+  height: auto;
+  background: linear-gradient(180deg, #1e1e1e 0%, #161616 100%);
+  border-top: 1px solid #333;
+  padding: 10px 16px;
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.mixer-section {
+  flex: 1;
+}
+
+.transport-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 16px;
+  border-left: 1px solid #333;
+}
+
+/* Transport Buttons */
+.transport-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: all 100ms ease-out;
+  position: relative;
+}
+
+.transport-btn:hover {
+  background: linear-gradient(180deg, #333 0%, #2a2a2a 100%);
+}
+
+.transport-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.transport-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--vm-text-secondary);
+}
+
+.transport-btn.recording {
+  background: linear-gradient(180deg, var(--vm-accent-danger) 0%, #aa2222 100%);
+  border-color: #ff5555;
+}
+
+.transport-btn.recording svg {
+  fill: white;
+}
+
+.transport-btn::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vm-led-off);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.transport-btn.active::after {
+  background: var(--vm-led-green);
+  box-shadow: 0 0 8px var(--vm-led-green-glow);
+}
+
+.transport-btn.recording::after {
+  background: var(--vm-led-red);
+  box-shadow: 0 0 8px var(--vm-led-red-glow);
+  animation: led-blink 0.8s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Panel Styling (shared)
+   ───────────────────────────────────────────────────────────────────────────── */
+.console-panel {
+  background: var(--vm-panel-base);
+  border-radius: 4px;
+  box-shadow: var(--vm-bevel-inset);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.console-panel-header {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--vm-silkscreen);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #333 0%, #2a2a2a 100%);
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.console-panel-header .led-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vm-led-off);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.console-panel-header .led-indicator.active {
+  background: var(--vm-led-green);
+  box-shadow: 0 0 6px var(--vm-led-green-glow);
+}
+
+.console-panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LCD Status Display
+   ───────────────────────────────────────────────────────────────────────────── */
+.lcd-status {
+  margin-left: auto;
+  padding-right: 16px;
+}
+
+.lcd-status-display {
+  font-family: var(--font-lcd);
+  font-size: 16px;
+  color: var(--vm-lcd-text);
+  background: var(--vm-lcd-bg);
+  padding: 4px 12px;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.8),
+    inset 0 0 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 8px var(--vm-lcd-glow), 0 0 16px var(--vm-lcd-glow);
+  letter-spacing: 0.08em;
+  min-width: 180px;
   text-align: center;
+  position: relative;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.lcd-status-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  border-radius: 2px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* ─────────────────────────────────────────────────────────────────────────────
+   Logo/Brand Area
+   ───────────────────────────────────────────────────────────────────────────── */
+.brand-logo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--vm-silkscreen);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.card {
-  padding: 2em;
+.brand-logo .star {
+  font-size: 10px;
+  opacity: 0.6;
 }
 
-.read-the-docs {
-  color: #888;
+/* ─────────────────────────────────────────────────────────────────────────────
+   Screw Details (decorative)
+   ───────────────────────────────────────────────────────────────────────────── */
+.panel-screw {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #444 0%, #1a1a1a 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+.panel-screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 6px;
+  height: 1px;
+  background: #333;
+  box-shadow: 0 0 0 1px #1a1a1a;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Animation Keyframes
+   ───────────────────────────────────────────────────────────────────────────── */
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes lcd-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+
+/* Apply subtle flicker to LCD */
+.lcd-status-display {
+  animation: lcd-flicker 0.1s ease-in-out infinite;
 }
