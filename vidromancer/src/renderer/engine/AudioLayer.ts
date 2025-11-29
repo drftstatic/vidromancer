@@ -286,11 +286,11 @@ export class AudioLayer {
 
     /**
      * Update the visualizer (call each frame)
+     * NOTE: This is a no-op now - update happens inside render() to avoid double updates.
+     * Kept for API compatibility.
      */
     update(): void {
-        if (this.visualizer && this._enabled) {
-            this.visualizer.update();
-        }
+        // Update now happens inside render() to avoid calling it twice per frame
     }
 
     /**
@@ -305,6 +305,9 @@ export class AudioLayer {
             return baseTexture;
         }
 
+        // Update visualizer state with current audio data
+        this.visualizer.update();
+
         // Render the visualizer to its internal render target
         this.visualizer.render(renderer);
 
@@ -314,7 +317,7 @@ export class AudioLayer {
 
         renderer.setRenderTarget(this.renderTarget);
         renderer.render(this.scene, this.camera);
-        renderer.setRenderTarget(null);
+        // NOTE: Don't reset render target to null here - let caller manage that
 
         return this.renderTarget.texture;
     }

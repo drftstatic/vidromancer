@@ -27,8 +27,9 @@ export abstract class AudioVisualizer {
         this.height = height;
 
         // Create scene for visualizer
+        // NOTE: Do NOT set scene.background - we need transparent background
+        // so the composite shader can properly blend the visualizer over video
         this.scene = new THREE.Scene();
-        this.scene.background = this.backgroundColor;
 
         // Orthographic camera for 2D rendering
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
@@ -56,12 +57,15 @@ export abstract class AudioVisualizer {
 
     /**
      * Render the visualizer to its render target
+     * NOTE: Does NOT call update() - that should be called separately before render.
+     * NOTE: Does NOT reset render target to null - caller is responsible for that.
      */
     public render(renderer: THREE.WebGLRenderer): void {
-        this.update();
         renderer.setRenderTarget(this.renderTarget);
+        // Clear with transparent black so only visualizer elements are visible
+        renderer.setClearColor(0x000000, 0);
+        renderer.clear();
         renderer.render(this.scene, this.camera);
-        renderer.setRenderTarget(null);
     }
 
     /**
@@ -104,6 +108,8 @@ export abstract class AudioVisualizer {
 
     /**
      * Set background color
+     * NOTE: Background color is stored but not used - we render with transparent
+     * background so the composite shader can blend properly over video.
      */
     public setBackgroundColor(color: THREE.Color | string | number): void {
         if (color instanceof THREE.Color) {
@@ -111,7 +117,7 @@ export abstract class AudioVisualizer {
         } else {
             this.backgroundColor = new THREE.Color(color);
         }
-        this.scene.background = this.backgroundColor;
+        // Don't set scene.background - keep transparent for proper compositing
     }
 
     /**

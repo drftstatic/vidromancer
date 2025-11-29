@@ -4,6 +4,7 @@ import { SourceManager } from '../engine/SourceManager';
 import { AudioLayer, AudioVisualizerType } from '../engine/AudioLayer';
 import { BlendMode } from '../engine/Mixer';
 import { VUMeter, CompactVU } from './VUMeter';
+import { CollapsiblePanel } from './CollapsiblePanel';
 import './AudioControlPanel.css';
 
 interface AudioControlPanelProps {
@@ -187,187 +188,186 @@ export const AudioControlPanel: React.FC<AudioControlPanelProps> = ({
     }
 
     return (
-        <div className="console-panel audio-control-panel">
-            <div className="console-panel-header">
-                <span>Audio</span>
-                <div className={`led-indicator ${sourceType !== 'none' ? 'active' : ''}`} />
+        <CollapsiblePanel
+            title="Audio"
+            icon="♫"
+            storageKey="audio-panel"
+            defaultExpanded={false}
+        >
+            {/* Source Selection */}
+            <div className="audio-control-section">
+                <label className="audio-control-label">Source</label>
+                <select
+                    className="vm-select"
+                    value={sourceType === 'mic' ? 'mic' : sourceType === 'clip' ? 'clipA' : 'none'}
+                    onChange={handleSourceTypeChange}
+                >
+                    <option value="none">None</option>
+                    <option value="mic">Mic Input</option>
+                    {sourceManager?.sourceA && <option value="clipA">Clip A Audio</option>}
+                    {sourceManager?.sourceB && <option value="clipB">Clip B Audio</option>}
+                </select>
             </div>
-            <div className="console-panel-content audio-control-content">
-                {/* Source Selection */}
+
+            {/* Device Selection (when mic selected) */}
+            {(sourceType === 'mic' || sourceType === 'none') && (
                 <div className="audio-control-section">
-                    <label className="audio-control-label">Source</label>
+                    <label className="audio-control-label">Input Device</label>
                     <select
                         className="vm-select"
-                        value={sourceType === 'mic' ? 'mic' : sourceType === 'clip' ? 'clipA' : 'none'}
-                        onChange={handleSourceTypeChange}
+                        value={selectedDevice}
+                        onChange={handleDeviceChange}
                     >
-                        <option value="none">None</option>
-                        <option value="mic">Mic Input</option>
-                        {sourceManager?.sourceA && <option value="clipA">Clip A Audio</option>}
-                        {sourceManager?.sourceB && <option value="clipB">Clip B Audio</option>}
+                        <option value="">Select Device...</option>
+                        {devices.map(d => (
+                            <option key={d.deviceId} value={d.deviceId}>
+                                {d.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
+            )}
 
-                {/* Device Selection (when mic selected) */}
-                {(sourceType === 'mic' || sourceType === 'none') && (
-                    <div className="audio-control-section">
-                        <label className="audio-control-label">Input Device</label>
-                        <select
-                            className="vm-select"
-                            value={selectedDevice}
-                            onChange={handleDeviceChange}
-                        >
-                            <option value="">Select Device...</option>
-                            {devices.map(d => (
-                                <option key={d.deviceId} value={d.deviceId}>
-                                    {d.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+            {/* Gain Control */}
+            <div className="audio-control-section audio-gain-section">
+                <label className="audio-control-label">Input Gain</label>
+                <div className="audio-gain-control">
+                    <input
+                        type="range"
+                        className="vm-fader audio-gain-fader"
+                        min="0"
+                        max="2"
+                        step="0.01"
+                        value={inputGain}
+                        onChange={handleGainChange}
+                    />
+                    <span className="audio-gain-value">{(inputGain * 100).toFixed(0)}%</span>
+                </div>
+            </div>
 
-                {/* Gain Control */}
-                <div className="audio-control-section audio-gain-section">
-                    <label className="audio-control-label">Input Gain</label>
-                    <div className="audio-gain-control">
+            {/* Monitor Control */}
+            <div className="audio-control-section audio-monitor-section">
+                <div className="audio-monitor-toggle">
+                    <button
+                        className={`vm-button vm-button-sm ${monitorEnabled ? 'active' : ''}`}
+                        onClick={handleMonitorToggle}
+                        title="Enable audio monitoring (playthrough)"
+                    >
+                        <span className="monitor-icon">🎧</span>
+                        MON
+                    </button>
+                </div>
+                {monitorEnabled && (
+                    <div className="audio-monitor-volume">
                         <input
                             type="range"
-                            className="vm-fader audio-gain-fader"
+                            className="vm-fader vm-fader-sm"
                             min="0"
-                            max="2"
+                            max="1"
                             step="0.01"
-                            value={inputGain}
-                            onChange={handleGainChange}
+                            value={monitorVolume}
+                            onChange={handleMonitorVolumeChange}
                         />
-                        <span className="audio-gain-value">{(inputGain * 100).toFixed(0)}%</span>
-                    </div>
-                </div>
-
-                {/* Monitor Control */}
-                <div className="audio-control-section audio-monitor-section">
-                    <div className="audio-monitor-toggle">
-                        <button
-                            className={`vm-button vm-button-sm ${monitorEnabled ? 'active' : ''}`}
-                            onClick={handleMonitorToggle}
-                            title="Enable audio monitoring (playthrough)"
-                        >
-                            <span className="monitor-icon">🎧</span>
-                            MON
-                        </button>
-                    </div>
-                    {monitorEnabled && (
-                        <div className="audio-monitor-volume">
-                            <input
-                                type="range"
-                                className="vm-fader vm-fader-sm"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={monitorVolume}
-                                onChange={handleMonitorVolumeChange}
-                            />
-                        </div>
-                    )}
-                </div>
-
-                {/* Level Meters */}
-                <div className="audio-control-section audio-levels-section">
-                    <div className="audio-level-bars">
-                        <LevelBar label="BASS" value={levels.bass} color="var(--vm-accent-primary)" />
-                        <LevelBar label="MID" value={levels.mid} color="var(--vm-accent-secondary)" />
-                        <LevelBar label="HIGH" value={levels.treble} color="var(--vm-accent-tertiary, #aa66ff)" />
-                        <LevelBar label="VOL" value={levels.vol} color="#fff" />
-                    </div>
-                </div>
-
-                {/* Audio Visualizer Layer Controls */}
-                {audioLayer && (
-                    <div className="audio-visualizer-section">
-                        <div className="audio-section-divider" />
-                        <label className="audio-section-title">Visualizer Layer</label>
-
-                        {/* Visualizer Type & Enable */}
-                        <div className="audio-control-section audio-viz-header">
-                            <select
-                                className="vm-select"
-                                value={visualizerType}
-                                onChange={handleVisualizerTypeChange}
-                            >
-                                <option value="none">Off</option>
-                                <option value="spectrum">Spectrum</option>
-                                <option value="waveform">Waveform</option>
-                                <option value="circular">Circular</option>
-                            </select>
-                            <button
-                                className={`vm-button vm-button-sm ${visualizerEnabled ? 'active' : ''}`}
-                                onClick={handleVisualizerToggle}
-                                disabled={visualizerType === 'none'}
-                                title="Enable/Disable visualizer layer"
-                            >
-                                {visualizerEnabled ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-
-                        {/* Visualizer Settings (when enabled) */}
-                        {visualizerType !== 'none' && (
-                            <>
-                                {/* Blend Mode */}
-                                <div className="audio-control-section">
-                                    <label className="audio-control-label">Blend</label>
-                                    <select
-                                        className="vm-select vm-select-sm"
-                                        value={visualizerBlendMode}
-                                        onChange={handleVisualizerBlendModeChange}
-                                    >
-                                        <option value="add">Add</option>
-                                        <option value="screen">Screen</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="multiply">Multiply</option>
-                                        <option value="overlay">Overlay</option>
-                                        <option value="difference">Difference</option>
-                                    </select>
-                                </div>
-
-                                {/* Opacity */}
-                                <div className="audio-control-section">
-                                    <label className="audio-control-label">Opacity</label>
-                                    <div className="audio-viz-slider">
-                                        <input
-                                            type="range"
-                                            className="vm-fader vm-fader-sm"
-                                            min="0"
-                                            max="1"
-                                            step="0.01"
-                                            value={visualizerOpacity}
-                                            onChange={handleVisualizerOpacityChange}
-                                        />
-                                        <span className="audio-viz-value">{(visualizerOpacity * 100).toFixed(0)}%</span>
-                                    </div>
-                                </div>
-
-                                {/* Intensity */}
-                                <div className="audio-control-section">
-                                    <label className="audio-control-label">Intensity</label>
-                                    <div className="audio-viz-slider">
-                                        <input
-                                            type="range"
-                                            className="vm-fader vm-fader-sm"
-                                            min="0"
-                                            max="2"
-                                            step="0.01"
-                                            value={visualizerIntensity}
-                                            onChange={handleVisualizerIntensityChange}
-                                        />
-                                        <span className="audio-viz-value">{(visualizerIntensity * 100).toFixed(0)}%</span>
-                                    </div>
-                                </div>
-                            </>
-                        )}
                     </div>
                 )}
             </div>
-        </div>
+
+            {/* Level Meters */}
+            <div className="audio-control-section audio-levels-section">
+                <div className="audio-level-bars">
+                    <LevelBar label="BASS" value={levels.bass} color="var(--vm-accent-primary)" />
+                    <LevelBar label="MID" value={levels.mid} color="var(--vm-accent-secondary)" />
+                    <LevelBar label="HIGH" value={levels.treble} color="var(--vm-accent-tertiary, #aa66ff)" />
+                    <LevelBar label="VOL" value={levels.vol} color="#fff" />
+                </div>
+            </div>
+
+            {/* Audio Visualizer Layer Controls */}
+            {audioLayer && (
+                <div className="audio-visualizer-section">
+                    <div className="audio-section-divider" />
+                    <label className="audio-section-title">Visualizer Layer</label>
+
+                    {/* Visualizer Type & Enable */}
+                    <div className="audio-control-section audio-viz-header">
+                        <select
+                            className="vm-select"
+                            value={visualizerType}
+                            onChange={handleVisualizerTypeChange}
+                        >
+                            <option value="none">Off</option>
+                            <option value="spectrum">Spectrum</option>
+                            <option value="waveform">Waveform</option>
+                            <option value="circular">Circular</option>
+                        </select>
+                        <button
+                            className={`vm-button vm-button-sm ${visualizerEnabled ? 'active' : ''}`}
+                            onClick={handleVisualizerToggle}
+                            disabled={visualizerType === 'none'}
+                            title="Enable/Disable visualizer layer"
+                        >
+                            {visualizerEnabled ? 'ON' : 'OFF'}
+                        </button>
+                    </div>
+
+                    {/* Visualizer Settings (when enabled) */}
+                    {visualizerType !== 'none' && (
+                        <>
+                            {/* Blend Mode */}
+                            <div className="audio-control-section">
+                                <label className="audio-control-label">Blend</label>
+                                <select
+                                    className="vm-select vm-select-sm"
+                                    value={visualizerBlendMode}
+                                    onChange={handleVisualizerBlendModeChange}
+                                >
+                                    <option value="add">Add</option>
+                                    <option value="screen">Screen</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="multiply">Multiply</option>
+                                    <option value="overlay">Overlay</option>
+                                    <option value="difference">Difference</option>
+                                </select>
+                            </div>
+
+                            {/* Opacity */}
+                            <div className="audio-control-section">
+                                <label className="audio-control-label">Opacity</label>
+                                <div className="audio-viz-slider">
+                                    <input
+                                        type="range"
+                                        className="vm-fader vm-fader-sm"
+                                        min="0"
+                                        max="1"
+                                        step="0.01"
+                                        value={visualizerOpacity}
+                                        onChange={handleVisualizerOpacityChange}
+                                    />
+                                    <span className="audio-viz-value">{(visualizerOpacity * 100).toFixed(0)}%</span>
+                                </div>
+                            </div>
+
+                            {/* Intensity */}
+                            <div className="audio-control-section">
+                                <label className="audio-control-label">Intensity</label>
+                                <div className="audio-viz-slider">
+                                    <input
+                                        type="range"
+                                        className="vm-fader vm-fader-sm"
+                                        min="0"
+                                        max="2"
+                                        step="0.01"
+                                        value={visualizerIntensity}
+                                        onChange={handleVisualizerIntensityChange}
+                                    />
+                                    <span className="audio-viz-value">{(visualizerIntensity * 100).toFixed(0)}%</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+        </CollapsiblePanel>
     );
 };
 
