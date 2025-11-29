@@ -20,9 +20,20 @@ const categoryIcons: Record<string, string> = {
     audio: '♫',
 };
 
+// Category tab labels for filtering (short names)
+const categoryTabLabels: Record<string, string> = {
+    all: 'ALL',
+    video: 'VIDEO',
+    audio: 'AUDIO',
+};
+
+// Categories that fall under 'video' tab
+const videoCategories = ['blur', 'distortion', 'color', 'stylize', 'key', 'time'];
+
 export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectId, onSelectEffect, onUpdate }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'all' | 'video' | 'audio'>('all');
 
     const addEffect = (name: string) => {
         const effect = createEffect(name);
@@ -51,6 +62,16 @@ export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectI
 
     const categories = getCategories();
 
+    // Filter categories based on active tab
+    const getFilteredCategories = () => {
+        if (activeTab === 'video') {
+            return categories.filter(c => videoCategories.includes(c));
+        } else if (activeTab === 'audio') {
+            return categories.filter(c => c === 'audio');
+        }
+        return categories;
+    };
+
     return (
         <div className="console-panel" style={{ flex: 1 }}>
             <div className="console-panel-header">
@@ -59,6 +80,45 @@ export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectI
             </div>
 
             <div className="console-panel-content">
+                {/* Category Tabs */}
+                <div style={{
+                    display: 'flex',
+                    gap: '2px',
+                    marginBottom: '8px',
+                    background: 'var(--vm-enclosure-dark)',
+                    borderRadius: '3px',
+                    padding: '2px',
+                }}>
+                    {(['all', 'video', 'audio'] as const).map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            style={{
+                                flex: 1,
+                                padding: '5px 8px',
+                                border: 'none',
+                                borderRadius: '2px',
+                                background: activeTab === tab
+                                    ? 'linear-gradient(180deg, var(--vm-enclosure-light) 0%, var(--vm-enclosure-mid) 100%)'
+                                    : 'transparent',
+                                color: activeTab === tab
+                                    ? 'var(--vm-text-primary)'
+                                    : 'var(--vm-text-dim)',
+                                fontSize: '9px',
+                                fontFamily: 'var(--font-label)',
+                                letterSpacing: '0.1em',
+                                cursor: 'pointer',
+                                transition: 'all var(--vm-transition-fast)',
+                                boxShadow: activeTab === tab
+                                    ? 'var(--vm-shadow-sm)'
+                                    : 'none',
+                            }}
+                        >
+                            {categoryTabLabels[tab]}
+                        </button>
+                    ))}
+                </div>
+
                 {/* Add Effect Button */}
                 <div style={{ position: 'relative', marginBottom: '8px' }}>
                     <button
@@ -66,7 +126,7 @@ export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectI
                         className="vm-button vm-button-primary"
                         style={{ width: '100%' }}
                     >
-                        + Add Effect
+                        + Add {activeTab === 'audio' ? 'Audio' : activeTab === 'video' ? 'Video' : ''} Effect
                     </button>
 
                     {/* Effect Menu */}
@@ -85,7 +145,7 @@ export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectI
                             boxShadow: 'var(--vm-shadow-lg)',
                             marginTop: '4px',
                         }}>
-                            {categories.map(category => (
+                            {getFilteredCategories().map(category => (
                                 <div key={category}>
                                     <div
                                         onClick={() => setActiveCategory(activeCategory === category ? null : category)}

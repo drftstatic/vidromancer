@@ -5,6 +5,7 @@ import { SourceManager } from '../engine/SourceManager';
 import { EffectChain } from '../engine/EffectChain';
 import { LFOManager } from '../engine/modulation/LFOManager';
 import { AudioReactiveManager } from '../engine/modulation/AudioReactiveManager';
+import { AudioLayer } from '../engine/AudioLayer';
 
 interface PreviewWindowProps {
     mixer: Mixer;
@@ -12,9 +13,10 @@ interface PreviewWindowProps {
     effectChain?: EffectChain;
     lfoManager?: LFOManager;
     audioReactiveManager?: AudioReactiveManager;
+    audioLayer?: AudioLayer;
 }
 
-export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManager, effectChain, lfoManager, audioReactiveManager }) => {
+export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManager, effectChain, lfoManager, audioReactiveManager, audioLayer }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const animationRef = useRef<number>(0);
@@ -98,13 +100,8 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
             }
 
             if (effects.length === 0) {
-                // No effects - render directly to screen
-                renderer.setRenderTarget(null);
-                material.map = inputTexture;
-                material.color.setRGB(1, 1, 1); // Reset color to white so texture shows
-                material.needsUpdate = true;
-                quad.material = material;
-                renderer.render(scene, camera);
+                // No effects - just use mixed texture
+                // inputTexture is already mixedTexture
             } else {
                 // Process effect chain
                 let writeFBO = fbo1;
@@ -124,15 +121,21 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
                     writeFBO = readFBO;
                     readFBO = temp;
                 }
-
-                // Final render to screen
-                renderer.setRenderTarget(null);
-                material.map = inputTexture;
-                material.color.setRGB(1, 1, 1);
-                material.needsUpdate = true;
-                quad.material = material;
-                renderer.render(scene, camera);
             }
+
+            // Apply audio layer on top of processed video (if enabled)
+            if (audioLayer) {
+                audioLayer.update();
+                inputTexture = audioLayer.render(renderer, inputTexture);
+            }
+
+            // Final render to screen
+            renderer.setRenderTarget(null);
+            material.map = inputTexture;
+            material.color.setRGB(1, 1, 1); // Reset color to white so texture shows
+            material.needsUpdate = true;
+            quad.material = material;
+            renderer.render(scene, camera);
         };
 
         animate();
@@ -146,6 +149,9 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
             fbo1.setSize(width, height);
             fbo2.setSize(width, height);
             mixer.setSize(width, height);
+            if (audioLayer) {
+                audioLayer.setSize(width, height);
+            }
         };
 
         window.addEventListener('resize', handleResize);
@@ -164,7 +170,7 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
                 containerRef.current.removeChild(renderer.domElement);
             }
         };
-    }, [mixer, sourceManager, effectChain, lfoManager, audioReactiveManager]);
+    }, [mixer, sourceManager, effectChain, lfoManager, audioReactiveManager, audioLayer]);
 
     return (
         <div

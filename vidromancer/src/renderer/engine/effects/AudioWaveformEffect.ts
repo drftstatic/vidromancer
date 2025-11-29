@@ -1,65 +1,101 @@
+import * as THREE from 'three';
 import { Effect } from './Effect';
 
 const fragmentShader = `
 uniform sampler2D tDiffuse;
+uniform sampler2D tAudioWaveform;
 uniform float uTime;
 uniform float amplitude;
 uniform float thickness;
-uniform vec3 color;
+uniform float hue;
+uniform float glow;
 uniform float mode; // 0 = overlay, 1 = replace
 
 varying vec2 vUv;
 
-// We'll use a simple sine wave simulation for now since we can't easily pass the raw array 
-// to the shader without a texture. But wait! We can pass the audio data as a texture or uniform array.
-// For this MVP, let's assume we are modulating the "amplitude" parameter with the AudioReactiveManager
-// and drawing a synthesized wave, OR we can try to pass a data texture.
-// 
-// Actually, for a true waveform effect, we need the data.
-// Let's create a "data texture" approach in the future.
-// For now, let's make a "Oscilloscope" style effect that uses the audio volume to modulate a wave.
+// HSL to RGB conversion
+vec3 hsl2rgb(float h, float s, float l) {
+    float c = (1.0 - abs(2.0 * l - 1.0)) * s;
+    float x = c * (1.0 - abs(mod(h * 6.0, 2.0) - 1.0));
+    float m = l - c / 2.0;
+    vec3 rgb;
+    if (h < 1.0/6.0) rgb = vec3(c, x, 0.0);
+    else if (h < 2.0/6.0) rgb = vec3(x, c, 0.0);
+    else if (h < 3.0/6.0) rgb = vec3(0.0, c, x);
+    else if (h < 4.0/6.0) rgb = vec3(0.0, x, c);
+    else if (h < 5.0/6.0) rgb = vec3(x, 0.0, c);
+    else rgb = vec3(c, 0.0, x);
+    return rgb + m;
+}
 
 void main() {
     vec4 texColor = texture2D(tDiffuse, vUv);
-    
-    // Center line
-    float y = 0.5;
-    
-    // Create a wave
-    // We use uTime for phase, and we want the amplitude to be reactive
-    float wave = sin(vUv.x * 20.0 + uTime * 5.0) * amplitude * 0.5;
-    
-    // Distance from wave
-    float dist = abs(vUv.y - (y + wave));
-    
-    // Draw line
-    float line = 1.0 - smoothstep(thickness - 0.01, thickness, dist);
-    
-    vec3 waveColor = color * line;
-    
+
+    // Sample waveform data at this X position
+    float waveformValue = texture2D(tAudioWaveform, vec2(vUv.x, 0.5)).r;
+
+    // Center line at 0.5, waveform goes above and below
+    float y = 0.5 + waveformValue * amplitude * 0.5;
+
+    // Distance from waveform line
+    float dist = abs(vUv.y - y);
+
+    // Draw line with smooth edges
+    float line = 1.0 - smoothstep(thickness * 0.5, thickness, dist);
+
+    // Color based on hue parameter
+    vec3 waveColor = hsl2rgb(hue, 0.9, 0.6);
+
+    // Apply glow effect
+    float glowFactor = exp(-dist * 20.0 / glow) * glow * 0.5;
+    vec3 glowColor = waveColor * glowFactor;
+
+    vec3 finalWaveColor = waveColor * line + glowColor;
+
     if (mode < 0.5) {
-        // Overlay
-        gl_FragColor = vec4(max(texColor.rgb, waveColor), texColor.a);
+        // Additive overlay
+        gl_FragColor = vec4(texColor.rgb + finalWaveColor, texColor.a);
     } else {
-        // Replace (black background)
-        gl_FragColor = vec4(mix(texColor.rgb, waveColor, line), 1.0);
+        // Replace
+        float alpha = max(line, glowFactor * 0.5);
+        gl_FragColor = vec4(mix(texColor.rgb, finalWaveColor, alpha), 1.0);
     }
 }
 `;
 
 export class AudioWaveformEffect extends Effect {
+    private waveformTexture: THREE.DataTexture | null = null;
+
     constructor() {
         super('AudioWaveform', fragmentShader, [
-            { id: 'amplitude', label: 'Amplitude', type: 'float', min: 0, max: 1, defaultValue: 0.5 },
-            { id: 'thickness', label: 'Thickness', type: 'float', min: 0.001, max: 0.1, defaultValue: 0.02 },
-            // Color would ideally be a color picker, but we only have float/bool. 
-            // We'll hardcode white for now or maybe add color params later if needed.
-            // Actually, let's just use a float for "Hue" if we implement HSL in shader, 
-            // but for now let's keep it simple: White wave.
-            { id: 'mode', label: 'Overlay/Replace', type: 'boolean', defaultValue: false }, // false = overlay
+            { id: 'amplitude', label: 'Amplitude', type: 'float', min: 0, max: 2, defaultValue: 1.0 },
+            { id: 'thickness', label: 'Thickness', type: 'float', min: 0.002, max: 0.05, defaultValue: 0.01 },
+            { id: 'hue', label: 'Hue', type: 'float', min: 0, max: 1, defaultValue: 0.5 },
+            { id: 'glow', label: 'Glow', type: 'float', min: 0, max: 2, defaultValue: 0.5 },
+            { id: 'mode', label: 'Overlay/Replace', type: 'boolean', defaultValue: false },
         ]);
 
-        // Inject color uniform manually since we don't have a color param type yet
-        this.uniforms['color'] = { value: [1, 1, 1] };
+        // Create a placeholder waveform texture
+        const data = new Float32Array(512);
+        this.waveformTexture = new THREE.DataTexture(data, 512, 1, THREE.RedFormat, THREE.FloatType);
+        this.waveformTexture.needsUpdate = true;
+        this.uniforms['tAudioWaveform'] = { value: this.waveformTexture };
+    }
+
+    /**
+     * Update the waveform texture with real audio data
+     */
+    setWaveformTexture(texture: THREE.DataTexture | null): void {
+        if (texture) {
+            this.uniforms['tAudioWaveform'].value = texture;
+            this.waveformTexture = texture;
+        }
+    }
+
+    /**
+     * Get the waveform texture uniform for external binding
+     */
+    getWaveformTextureUniform(): THREE.IUniform {
+        return this.uniforms['tAudioWaveform'];
     }
 }

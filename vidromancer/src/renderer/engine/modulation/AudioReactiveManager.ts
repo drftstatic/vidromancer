@@ -1,5 +1,8 @@
 import { Effect } from '../effects/Effect';
 import { AudioManager } from '../../services/AudioManager';
+import { AudioSpectrumEffect } from '../effects/AudioSpectrumEffect';
+import { AudioWaveformEffect } from '../effects/AudioWaveformEffect';
+import { AudioGlowEffect } from '../effects/AudioGlowEffect';
 
 export type AudioFeature = 'bass' | 'mid' | 'treble' | 'vol';
 
@@ -60,6 +63,36 @@ export class AudioReactiveManager {
         // First update the audio analysis
         this.audioManager.update();
 
+        // Update audio-specific effects with textures and levels
+        for (const effect of effects) {
+            // Pass spectrum texture to AudioSpectrumEffect
+            if (effect instanceof AudioSpectrumEffect) {
+                const spectrumTexture = this.audioManager.getSpectrumTexture();
+                if (spectrumTexture) {
+                    effect.setSpectrumTexture(spectrumTexture);
+                }
+            }
+
+            // Pass waveform texture to AudioWaveformEffect
+            if (effect instanceof AudioWaveformEffect) {
+                const waveformTexture = this.audioManager.getWaveformTexture();
+                if (waveformTexture) {
+                    effect.setWaveformTexture(waveformTexture);
+                }
+            }
+
+            // Pass audio levels to AudioGlowEffect
+            if (effect instanceof AudioGlowEffect) {
+                effect.setAudioLevels(
+                    this.audioManager.bass,
+                    this.audioManager.mid,
+                    this.audioManager.treble,
+                    this.audioManager.volume
+                );
+            }
+        }
+
+        // Apply user-configured audio mappings
         for (const mapping of this.mappings) {
             const effect = effects.find(e => e.id === mapping.effectId);
             if (!effect) continue;
@@ -79,13 +112,6 @@ export class AudioReactiveManager {
             audioValue *= mapping.amount;
 
             // Map 0-1 to min-max
-            // We usually want to ADD to the base value or REPLACE?
-            // For now, let's say it modulates within the range. 
-            // A simple approach: value = min + (max - min) * audioValue
-            // But usually we want to modulate around a base value.
-            // Let's stick to the LFO approach: replace for now, or maybe add to base?
-            // The LFOManager has modes. Let's simplify and just map to range for now.
-
             const newValue = mapping.min + (mapping.max - mapping.min) * audioValue;
 
             // Clamp

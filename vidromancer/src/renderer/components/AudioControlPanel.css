@@ -1,0 +1,230 @@
+/* Audio Control Panel Styles */
+
+.audio-control-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.audio-control-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px !important;
+}
+
+.audio-control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.audio-control-label {
+    font-family: var(--font-label);
+    font-size: 9px;
+    color: var(--vm-silkscreen-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Gain Control */
+.audio-gain-section {
+    margin-top: 4px;
+}
+
+.audio-gain-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.audio-gain-fader {
+    flex: 1;
+}
+
+.audio-gain-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--vm-text-secondary);
+    min-width: 32px;
+    text-align: right;
+}
+
+/* Monitor Control */
+.audio-monitor-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.audio-monitor-toggle .vm-button {
+    font-size: 9px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.audio-monitor-toggle .vm-button.active {
+    background: linear-gradient(180deg, var(--vm-accent-secondary) 0%, #2288cc 100%);
+    border-color: var(--vm-accent-secondary);
+}
+
+.monitor-icon {
+    font-size: 10px;
+}
+
+.audio-monitor-volume {
+    flex: 1;
+}
+
+.audio-monitor-volume .vm-fader {
+    height: 4px;
+}
+
+/* Level Bars */
+.audio-levels-section {
+    margin-top: 4px;
+}
+
+.audio-level-bars {
+    display: flex;
+    gap: 4px;
+    height: 50px;
+    align-items: flex-end;
+}
+
+.audio-level-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+}
+
+.audio-level-bar-track {
+    flex: 1;
+    width: 100%;
+    background: var(--vm-enclosure-dark);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.audio-level-bar-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: height 0.05s linear;
+    border-radius: 1px;
+}
+
+.audio-level-bar-label {
+    font-family: var(--font-label);
+    font-size: 7px;
+    color: var(--vm-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Compact mode */
+.audio-control-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.audio-control-compact .vm-select-sm {
+    font-size: 10px;
+    padding: 4px 8px;
+    flex: 1;
+}
+
+/* Small button variant */
+.vm-button-sm {
+    font-size: 10px;
+    padding: 4px 8px;
+}
+
+/* Small fader variant */
+.vm-fader-sm {
+    height: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Audio Visualizer Section
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.audio-visualizer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.audio-section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #444 50%, transparent 100%);
+    margin: 4px 0;
+}
+
+.audio-section-title {
+    font-family: var(--font-label);
+    font-size: 9px;
+    color: var(--vm-accent-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 2px;
+}
+
+/* Visualizer header row */
+.audio-viz-header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.audio-viz-header .vm-select {
+    flex: 1;
+}
+
+.audio-viz-header .vm-button {
+    min-width: 40px;
+}
+
+.audio-viz-header .vm-button.active {
+    background: linear-gradient(180deg, var(--vm-led-green) 0%, #228822 100%);
+    border-color: var(--vm-led-green);
+    color: #fff;
+    text-shadow: 0 0 4px var(--vm-led-green-glow);
+}
+
+/* Visualizer slider row */
+.audio-viz-slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.audio-viz-slider .vm-fader {
+    flex: 1;
+}
+
+.audio-viz-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--vm-text-secondary);
+    min-width: 32px;
+    text-align: right;
+}
+
+/* Small select variant */
+.vm-select-sm {
+    font-size: 10px;
+    padding: 4px 8px;
+}

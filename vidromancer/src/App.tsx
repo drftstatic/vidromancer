@@ -16,7 +16,8 @@ import { RecorderManager } from './renderer/services/RecorderManager'
 import { PlasmaMixTube } from './renderer/components/PlasmaMixTube'
 import { AudioManager } from './renderer/services/AudioManager'
 import { AudioReactiveManager } from './renderer/engine/modulation/AudioReactiveManager'
-import { AudioSettings } from './renderer/components/AudioSettings'
+import { AudioControlPanel, VUMeterPanel } from './renderer/components/AudioControlPanel'
+import { AudioLayer } from './renderer/engine/AudioLayer'
 
 function App() {
   const sourceManager = useMemo(() => new SourceManager(), []);
@@ -27,6 +28,7 @@ function App() {
   const recorderManager = useMemo(() => new RecorderManager(), []);
   const audioManager = useMemo(() => new AudioManager(), []);
   const audioReactiveManager = useMemo(() => new AudioReactiveManager(audioManager), [audioManager]);
+  const audioLayer = useMemo(() => new AudioLayer(audioManager), [audioManager]);
 
   const [selectedEffect, setSelectedEffect] = useState<Effect | null>(null);
   const [, setTick] = useState(0);
@@ -53,8 +55,9 @@ function App() {
       clearInterval(interval);
       sourceManager.dispose();
       audioManager.dispose();
+      audioLayer.dispose();
     };
-  }, [sourceManager, midiManager, audioManager, checkConnections]);
+  }, [sourceManager, midiManager, audioManager, audioLayer, checkConnections]);
 
   const handleMixChange = (value: number) => {
     setMixValue(value);
@@ -175,7 +178,7 @@ function App() {
             onUpdate={handleUpdate}
           />
           <MidiSettings midiManager={midiManager} />
-          <AudioSettings audioManager={audioManager} />
+          <AudioControlPanel audioManager={audioManager} sourceManager={sourceManager} audioLayer={audioLayer} />
         </div>
 
         {/* Center Panel - Preview & LFO */}
@@ -187,6 +190,7 @@ function App() {
               effectChain={effectChain}
               lfoManager={lfoManager}
               audioReactiveManager={audioReactiveManager}
+              audioLayer={audioLayer}
             />
           </div>
           <LFOPanel
@@ -196,26 +200,33 @@ function App() {
           />
         </div>
 
-        {/* Right Panel - Mix (top 1/3) & Parameters (bottom 2/3) */}
+        {/* Right Panel - Meters & Parameters */}
         <div className="right-panel">
-          {/* Mix Section - Top 1/3 */}
-          <div className="mix-section">
-            <div className="console-panel mix-panel">
+          {/* Meters Section - Mix Tube + VU side by side */}
+          <div className="meters-section">
+            <div className="console-panel meters-panel">
               <div className="console-panel-header">
-                <span>Mix</span>
+                <span>Meters</span>
                 <div className="led-indicator active" />
               </div>
-              <div className="mix-panel-content">
-                <div className="mix-labels">
-                  <span className="mix-label-a">A</span>
-                  <span className="mix-label-b">B</span>
+              <div className="meters-panel-content">
+                {/* Mix Tube */}
+                <div className="meter-column mix-meter">
+                  <div className="mix-labels">
+                    <span className="mix-label-b">B</span>
+                    <span className="mix-label-a">A</span>
+                  </div>
+                  <PlasmaMixTube mixValue={mixValue} />
                 </div>
-                <PlasmaMixTube mixValue={mixValue} />
+                {/* VU Meter */}
+                <div className="meter-column vu-meter">
+                  <VUMeterPanel audioManager={audioManager} />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Parameter Section - Bottom 2/3 */}
+          {/* Parameter Section */}
           <div className="parameter-section">
             <ParameterPanel
               effect={selectedEffect}

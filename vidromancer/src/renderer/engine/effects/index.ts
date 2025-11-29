@@ -14,6 +14,9 @@ import { ScanlinesEffect } from './ScanlinesEffect';
 import { VHSEffect } from './VHSEffect';
 import { DisplacementEffect } from './DisplacementEffect';
 import { LumaKeyEffect } from './LumaKeyEffect';
+import { AudioSpectrumEffect } from './AudioSpectrumEffect';
+import { AudioWaveformEffect } from './AudioWaveformEffect';
+import { AudioGlowEffect } from './AudioGlowEffect';
 
 // Type for effect constructor
 type EffectConstructor = new () => Effect;
@@ -21,7 +24,7 @@ type EffectConstructor = new () => Effect;
 // Effect registry with metadata
 export interface EffectRegistryEntry {
     constructor: EffectConstructor;
-    category: 'distortion' | 'color' | 'stylize' | 'key' | 'blur' | 'time';
+    category: 'distortion' | 'color' | 'stylize' | 'key' | 'blur' | 'time' | 'audio';
     description: string;
 }
 
@@ -107,6 +110,23 @@ export const effectRegistry: Record<string, EffectRegistryEntry> = {
         category: 'time',
         description: 'Video feedback with decay'
     },
+
+    // Audio-reactive Effects
+    AudioSpectrum: {
+        constructor: AudioSpectrumEffect,
+        category: 'audio',
+        description: 'Frequency spectrum visualization'
+    },
+    AudioWaveform: {
+        constructor: AudioWaveformEffect,
+        category: 'audio',
+        description: 'Oscilloscope waveform display'
+    },
+    AudioGlow: {
+        constructor: AudioGlowEffect,
+        category: 'audio',
+        description: 'Audio-reactive edge glow'
+    },
 };
 
 // Helper to create effect by name
@@ -132,5 +152,5 @@ export function getAllEffectNames(): string[] {
 
 // Get all categories
 export function getCategories(): EffectRegistryEntry['category'][] {
-    return ['blur', 'distortion', 'color', 'stylize', 'key', 'time'];
+    return ['blur', 'distortion', 'color', 'stylize', 'key', 'time', 'audio'];
 }

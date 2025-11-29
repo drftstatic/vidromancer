@@ -6,6 +6,8 @@ export class VideoSource {
   public video: HTMLVideoElement;
   public texture: THREE.VideoTexture;
   public type: VideoSourceType = 'none';
+  public hasAudio: boolean = false;
+  private _muted: boolean = true;
 
   constructor() {
     this.video = document.createElement('video');
@@ -67,5 +69,47 @@ export class VideoSource {
   dispose() {
     this.stop();
     this.texture.dispose();
+  }
+
+  // Get video element for audio extraction
+  getVideoElement(): HTMLVideoElement {
+    return this.video;
+  }
+
+  // Control audio playback (mute/unmute)
+  setMuted(muted: boolean) {
+    this._muted = muted;
+    this.video.muted = muted;
+  }
+
+  isMuted(): boolean {
+    return this._muted;
+  }
+
+  // Check if video has audio tracks
+  checkAudio(): boolean {
+    // For file sources, check if video has audio tracks
+    if (this.type === 'file' && this.video.src) {
+      // Use mozHasAudio or webkitAudioDecodedByteCount for detection
+      const video = this.video as HTMLVideoElement & {
+        mozHasAudio?: boolean;
+        webkitAudioDecodedByteCount?: number;
+        audioTracks?: { length: number };
+      };
+
+      if (video.mozHasAudio !== undefined) {
+        this.hasAudio = video.mozHasAudio;
+      } else if (video.webkitAudioDecodedByteCount !== undefined) {
+        this.hasAudio = video.webkitAudioDecodedByteCount > 0;
+      } else if (video.audioTracks !== undefined) {
+        this.hasAudio = video.audioTracks.length > 0;
+      } else {
+        // Assume has audio if we can't detect
+        this.hasAudio = true;
+      }
+    } else {
+      this.hasAudio = false;
+    }
+    return this.hasAudio;
   }
 }
