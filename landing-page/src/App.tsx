@@ -99,7 +99,7 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
           >
-            <a href="https://github.com/drftstatic/lzx_clone/releases/download/v0.1.0-beta/Vidromancer-Mac-0.1.0-Installer.dmg" className="btn btn-primary">
+            <a href="https://github.com/drftstatic/vidromancer/releases/download/v0.1.0-beta/Vidromancer-Mac-0.1.0-Installer.dmg" className="btn btn-primary">
               <Download size={18} />
               DOWNLOAD FOR MAC
             </a>
@@ -246,7 +246,7 @@ function App() {
               </p>
 
               <div className="download-actions">
-                <a href="https://github.com/drftstatic/lzx_clone/releases/download/v0.1.0-beta/Vidromancer-Mac-0.1.0-Installer.dmg" className="btn btn-download">
+                <a href="https://github.com/drftstatic/vidromancer/releases/download/v0.1.0-beta/Vidromancer-Mac-0.1.0-Installer.dmg" className="btn btn-download">
                   <Download size={20} />
                   <div className="btn-text">
                     <span className="btn-label">Download for macOS</span>
