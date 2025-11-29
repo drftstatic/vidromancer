@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Effect } from '../engine/effects/Effect';
 import { MidiManager } from '../services/MidiManager';
 import { LFOManager } from '../engine/modulation/LFOManager';
+import { AudioReactiveManager, AudioFeature } from '../engine/modulation/AudioReactiveManager';
 
 interface ParameterPanelProps {
     effect: Effect | null;
     midiManager: MidiManager;
     lfoManager?: LFOManager;
+    audioReactiveManager?: AudioReactiveManager;
 }
 
-export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiManager, lfoManager }) => {
+export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiManager, lfoManager, audioReactiveManager }) => {
     const [, setTick] = useState(0);
     const [learningParam, setLearningParam] = useState<string | null>(null);
 
@@ -23,6 +25,13 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
             return unsubscribe;
         }
     }, [lfoManager]);
+
+    useEffect(() => {
+        if (audioReactiveManager) {
+            const unsubscribe = audioReactiveManager.onChange(() => setTick(t => t + 1));
+            return unsubscribe;
+        }
+    }, [audioReactiveManager]);
 
     if (!effect) {
         return (
@@ -69,6 +78,17 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
         });
     };
 
+    const handleAudioMap = (paramId: string, feature: AudioFeature | '', min: number, max: number) => {
+        if (!audioReactiveManager) return;
+
+        if (feature === '') {
+            audioReactiveManager.unmapParameter(effect.id, paramId);
+        } else {
+            audioReactiveManager.mapParameter(feature, effect.id, paramId, min, max);
+        }
+        setTick(t => t + 1);
+    };
+
     return (
         <div className="console-panel" style={{ height: '100%' }}>
             <div className="console-panel-header">
@@ -93,6 +113,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
                     const isModulated = lfoManager?.isParameterModulated(effect.id, param.id);
                     const mapping = lfoManager?.getMappingForParameter(effect.id, param.id);
                     const modulatingLfo = mapping ? lfoManager?.getLFO(mapping.lfoId) : null;
+
+                    const audioMapping = audioReactiveManager?.getMappingForParameter(effect.id, param.id);
+                    const isAudioModulated = !!audioMapping;
+
                     const currentValue = effect.uniforms[param.id]?.value;
 
                     return (
@@ -133,6 +157,18 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
                                             LFO: {modulatingLfo?.name}
                                         </span>
                                     )}
+                                    {isAudioModulated && (
+                                        <span style={{
+                                            background: 'var(--vm-accent-primary)',
+                                            padding: '2px 6px',
+                                            borderRadius: '2px',
+                                            fontSize: '9px',
+                                            color: '#000',
+                                            fontWeight: '600',
+                                        }}>
+                                            AUDIO: {audioMapping?.feature.toUpperCase()}
+                                        </span>
+                                    )}
                                 </label>
                                 <button
                                     onClick={() => handleLearn(param.id, param.min || 0, param.max || 1)}
@@ -165,10 +201,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
                                             step={param.step || 0.01}
                                             value={typeof currentValue === 'number' ? currentValue : 0}
                                             onChange={(e) => handleChange(param.id, parseFloat(e.target.value))}
-                                            disabled={isModulated}
+                                            disabled={isModulated || isAudioModulated}
                                             className="vm-fader"
                                             style={{
-                                                opacity: isModulated ? 0.5 : 1,
+                                                opacity: (isModulated || isAudioModulated) ? 0.5 : 1,
                                             }}
                                         />
                                     </div>
@@ -201,6 +237,25 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ effect, midiMana
                                 >
                                     {currentValue ? 'ON' : 'OFF'}
                                 </button>
+                            )}
+
+                            {/* Audio Modulation Selector */}
+                            {param.type === 'float' && !isModulated && (
+                                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '9px', color: 'var(--vm-text-dim)' }}>AUDIO MOD:</span>
+                                    <select
+                                        className="vm-select"
+                                        style={{ fontSize: '9px', padding: '2px', width: 'auto', flex: 1 }}
+                                        value={audioMapping?.feature || ''}
+                                        onChange={(e) => handleAudioMap(param.id, e.target.value as AudioFeature | '', param.min || 0, param.max || 1)}
+                                    >
+                                        <option value="">None</option>
+                                        <option value="bass">Bass</option>
+                                        <option value="mid">Mid</option>
+                                        <option value="treble">Treble</option>
+                                        <option value="vol">Volume</option>
+                                    </select>
+                                </div>
                             )}
 
                             {/* Remove LFO mapping button */}

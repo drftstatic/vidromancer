@@ -14,6 +14,9 @@ import { LFOManager } from './renderer/engine/modulation/LFOManager'
 import { MidiSettings } from './renderer/components/MidiSettings'
 import { RecorderManager } from './renderer/services/RecorderManager'
 import { PlasmaMixTube } from './renderer/components/PlasmaMixTube'
+import { AudioManager } from './renderer/services/AudioManager'
+import { AudioReactiveManager } from './renderer/engine/modulation/AudioReactiveManager'
+import { AudioSettings } from './renderer/components/AudioSettings'
 
 function App() {
   const sourceManager = useMemo(() => new SourceManager(), []);
@@ -22,6 +25,8 @@ function App() {
   const midiManager = useMemo(() => new MidiManager(), []);
   const lfoManager = useMemo(() => new LFOManager(), []);
   const recorderManager = useMemo(() => new RecorderManager(), []);
+  const audioManager = useMemo(() => new AudioManager(), []);
+  const audioReactiveManager = useMemo(() => new AudioReactiveManager(audioManager), [audioManager]);
 
   const [selectedEffect, setSelectedEffect] = useState<Effect | null>(null);
   const [, setTick] = useState(0);
@@ -47,8 +52,9 @@ function App() {
     return () => {
       clearInterval(interval);
       sourceManager.dispose();
+      audioManager.dispose();
     };
-  }, [sourceManager, midiManager, checkConnections]);
+  }, [sourceManager, midiManager, audioManager, checkConnections]);
 
   const handleMixChange = (value: number) => {
     setMixValue(value);
@@ -169,6 +175,7 @@ function App() {
             onUpdate={handleUpdate}
           />
           <MidiSettings midiManager={midiManager} />
+          <AudioSettings audioManager={audioManager} />
         </div>
 
         {/* Center Panel - Preview & LFO */}
@@ -179,6 +186,7 @@ function App() {
               sourceManager={sourceManager}
               effectChain={effectChain}
               lfoManager={lfoManager}
+              audioReactiveManager={audioReactiveManager}
             />
           </div>
           <LFOPanel
@@ -213,6 +221,7 @@ function App() {
               effect={selectedEffect}
               midiManager={midiManager}
               lfoManager={lfoManager}
+              audioReactiveManager={audioReactiveManager}
             />
           </div>
         </div>

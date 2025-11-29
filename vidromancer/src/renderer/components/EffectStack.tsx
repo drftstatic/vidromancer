@@ -17,6 +17,7 @@ const categoryIcons: Record<string, string> = {
     stylize: '*',
     key: '%',
     time: '&',
+    audio: '♫',
 };
 
 export const EffectStack: React.FC<EffectStackProps> = ({ chain, selectedEffectId, onSelectEffect, onUpdate }) => {

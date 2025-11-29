@@ -4,15 +4,17 @@ import { Mixer } from '../engine/Mixer';
 import { SourceManager } from '../engine/SourceManager';
 import { EffectChain } from '../engine/EffectChain';
 import { LFOManager } from '../engine/modulation/LFOManager';
+import { AudioReactiveManager } from '../engine/modulation/AudioReactiveManager';
 
 interface PreviewWindowProps {
     mixer: Mixer;
     sourceManager: SourceManager;
     effectChain?: EffectChain;
     lfoManager?: LFOManager;
+    audioReactiveManager?: AudioReactiveManager;
 }
 
-export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManager, effectChain, lfoManager }) => {
+export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManager, effectChain, lfoManager, audioReactiveManager }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const animationRef = useRef<number>(0);
@@ -90,6 +92,11 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
                 lfoManager.update(time, effects);
             }
 
+            // Apply Audio modulation
+            if (audioReactiveManager && effects.length > 0) {
+                audioReactiveManager.update(effects);
+            }
+
             if (effects.length === 0) {
                 // No effects - render directly to screen
                 renderer.setRenderTarget(null);
@@ -157,7 +164,7 @@ export const PreviewWindow: React.FC<PreviewWindowProps> = ({ mixer, sourceManag
                 containerRef.current.removeChild(renderer.domElement);
             }
         };
-    }, [mixer, sourceManager, effectChain, lfoManager]);
+    }, [mixer, sourceManager, effectChain, lfoManager, audioReactiveManager]);
 
     return (
         <div
